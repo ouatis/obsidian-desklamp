@@ -35,7 +35,6 @@ const en = {
 
   cmdToggle: "Turn the lamp on / off",
   cmdCycle: "Cycle granularity: line → sentence → paragraph → section",
-  cmdFocusedWindow: "Toggle “only dim the focused window”",
   cmdDiagnose: "Diagnose: why is nothing dimmed",
 
   toggleName: "Lamp",
@@ -62,10 +61,6 @@ const en = {
 
   dimTitleName: "Dim the note title",
   dimTitleDesc: "Dims the note title and the tab title as well.",
-
-  focusedWindowName: "Only dim the focused window",
-  focusedWindowDesc:
-    "Off by default. Obsidian has no reliable per-window focus API, and a wrong guess makes the plugin look broken.",
 
   onlyPathsName: "Only these paths",
   onlyPathsDesc:
@@ -113,7 +108,6 @@ const zh: Dict = {
 
   cmdToggle: "开 / 关台灯",
   cmdCycle: "切换粒度：行 → 句 → 段落 → 小节",
-  cmdFocusedWindow: "切换「只暗获得焦点的窗口」",
   cmdDiagnose: "诊断：为什么没有变暗",
 
   toggleName: "台灯开关",
@@ -140,10 +134,6 @@ const zh: Dict = {
 
   dimTitleName: "同时暗掉标题",
   dimTitleDesc: "笔记标题与标签页标题一并变暗。",
-
-  focusedWindowName: "只暗获得焦点的窗口",
-  focusedWindowDesc:
-    "默认关闭。Obsidian 没有可靠的 per-window 焦点接口，误判时插件会看起来像没反应。",
 
   onlyPathsName: "只对这些路径生效",
   onlyPathsDesc: "每行一个文件夹或文件，留空表示全部笔记。例：novels/ drafts/",
@@ -187,7 +177,6 @@ const ja: Dict = {
 
   cmdToggle: "ランプをオン / オフ",
   cmdCycle: "粒度を切替：行 → 句 → 段落 → 小節",
-  cmdFocusedWindow: "「フォーカス中のウィンドウだけ」を切り替える",
   cmdDiagnose: "診断：なぜ暗くならないのか",
 
   toggleName: "ランプ",
@@ -214,10 +203,6 @@ const ja: Dict = {
 
   dimTitleName: "ノートタイトルも暗くする",
   dimTitleDesc: "ノートタイトルとタブタイトルも暗くします。",
-
-  focusedWindowName: "フォーカス中のウィンドウだけ暗くする",
-  focusedWindowDesc:
-    "既定は無効。Obsidian には信頼できるウィンドウ単位のフォーカス API がなく、誤判定すると動かなくなったように見えます。",
 
   onlyPathsName: "このパスだけに適用",
   onlyPathsDesc:

@@ -180,6 +180,22 @@ t("ships no real vault paths or project names", () => {
   }
 });
 
+t("does not ship the unfocused-window option", () => {
+	// It was removed: Obsidian exposes no reliable per-window focus state
+	// (activeLeaf is shared across windows, and document.hasFocus() is
+	// wrong for popouts), so the switch could only ever guess — and a
+	// wrong guess looks like the plugin is broken. Guard it so it does
+	// not quietly come back as an unused setting.
+	for (const gone of [
+		"onlyFocusedWindow",
+		"isThisWindowActive",
+		"focused-window-only",
+		"hasFocus()",
+	]) {
+		assert.ok(!src.includes(gone), `must not reference ${gone}`);
+	}
+});
+
 t("bundle is reasonably small", () => {
 	const kb = Buffer.byteLength(src) / 1024;
 	assert.ok(kb < 60, `bundle is ${kb.toFixed(1)}KB, expected < 60KB`);

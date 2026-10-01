@@ -54,7 +54,6 @@ feature was built, tried, and removed.
 |---|---|
 | Turn the lamp on / off | `Ctrl/Cmd + Shift + S` |
 | Cycle granularity | `Ctrl/Cmd + Alt + G` |
-| Only dim the focused window | `Ctrl/Cmd + Alt + W` |
 | Diagnose | command palette |
 
 Every hotkey is rebindable in Obsidian's keyboard settings. The on/off state is
@@ -84,7 +83,7 @@ npm run dev         # watch build
 npm run typecheck
 npm test            # 49 engine tests
 npm run build       # production build
-npm run test:bundle # 15 smoke tests against the built artifact
+npm run test:bundle # 16 smoke tests against the built artifact
 npm run verify      # all of the above, then install into the vault
 ```
 

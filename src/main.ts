@@ -40,8 +40,6 @@ interface JingyidianSettings extends EngineConfig, ScopeRules {
   statusText: string;
   /** UI language, remembered in the vault. */
   lang: Lang;
-  /** Limit dimming to the window that has OS focus. */
-  onlyFocusedWindow: boolean;
   /** Set once the one-time settings hand-off has happened. */
   migratedFromStille?: boolean;
 }
@@ -52,7 +50,6 @@ const DEFAULTS: JingyidianSettings = {
   showStatusBar: true,
   statusText: dict(DEFAULT_LANG).pluginName,
   lang: DEFAULT_LANG,
-  onlyFocusedWindow: false,
 };
 
 /** Status-bar labels from before the UI moved to English. */
@@ -100,17 +97,6 @@ export default class JingyidianPlugin extends Plugin {
       hotkeys: [{ modifiers: ["Mod", "Alt"], key: "G" }],
     });
     this.addCommand({
-      id: "focused-window-only",
-      name: this.t.cmdFocusedWindow,
-      callback: () => {
-        void this.patch({
-          onlyFocusedWindow: !this.settings.onlyFocusedWindow,
-        });
-      },
-      hotkeys: [{ modifiers: ["Mod", "Alt"], key: "W" }],
-    });
-
-    this.addCommand({
       id: "diagnose",
       name: this.t.cmdDiagnose,
       callback: () => this.diagnose(),
@@ -142,13 +128,7 @@ export default class JingyidianPlugin extends Plugin {
 
     // Re-apply config to every open editor now and on any leaf change.
     this.app.workspace.onLayoutReady(() => this.syncAllEditors());
-
-    window.addEventListener("focus", this.onWindowFocus);
-    window.addEventListener("blur", this.onWindowBlur);
-    this.register(() => {
-      window.removeEventListener("focus", this.onWindowFocus);
-      window.removeEventListener("blur", this.onWindowBlur);
-    });
+    this.register(() => {});
 
     this.renderStatusBar();
     this.syncAllEditors();
@@ -163,9 +143,6 @@ export default class JingyidianPlugin extends Plugin {
     // Strip anything we put on <body> so nothing leaks after disabling.
     document.body.classList.remove("dl-title-dim", "dl-active");
   }
-
-  private onWindowFocus = () => this.syncAllEditors();
-  private onWindowBlur = () => this.syncAllEditors();
 
   /** Strings for the selected UI language. */
   get t() {
@@ -278,13 +255,6 @@ export default class JingyidianPlugin extends Plugin {
             fmValue,
           );
 
-    // Multi-window focus detection is not something Obsidian exposes
-    // reliably (activeLeaf is shared across windows and document.
-    // hasFocus() is wrong for popouts), so this is opt-in and off by
-    // default rather than guessed at.
-    const windowOk =
-      !this.settings.onlyFocusedWindow || this.isThisWindowActive();
-
     // A granularity in the frontmatter wins over the global setting, so
     // one note can be pinned without changing every other note.
     const granularity =
@@ -293,7 +263,7 @@ export default class JingyidianPlugin extends Plugin {
         : this.settings.granularity;
 
     return {
-      enabled: this.settings.enabled && inScope && windowOk,
+      enabled: this.settings.enabled && inScope,
       granularity,
       dimOpacity: clamp01(this.settings.dimOpacity),
       sectionLevel: Math.min(6, Math.max(1, this.settings.sectionLevel)),
@@ -302,28 +272,6 @@ export default class JingyidianPlugin extends Plugin {
       transitionMs: Math.max(0, this.settings.transitionMs),
       dimTitle: this.settings.dimTitle,
     };
-  }
-
-  /**
-   * Best-effort: is this window the focused one? Obsidian does not expose
-   * this, so we infer it from whether the active leaf's DOM lives in the
-   * document that currently has focus. Returns true when we cannot tell —
-   * dimming everything is a worse failure than dimming nothing visible.
-   */
-  private isThisWindowActive(): boolean {
-    try {
-      const el = this.app.workspace.activeLeaf?.view?.containerEl;
-      if (!el) return true;
-      const doc = el.ownerDocument;
-      if (doc.hasFocus()) return true;
-      // Another window holds focus: only treat ourselves as inactive
-      // when Obsidian really did report a second window.
-      // @ts-expect-error - windows is not in the public typings
-      const count = this.app.workspace.windows?.length ?? 1;
-      return count <= 1 ? true : false;
-    } catch {
-      return true;
-    }
   }
 
   /**
@@ -456,9 +404,6 @@ export default class JingyidianPlugin extends Plugin {
     } else {
       lines.push("no markdown note open");
     }
-
-    lines.push(`only-dim focused window: ${this.settings.onlyFocusedWindow}`);
-    lines.push(`window considered active: ${this.isThisWindowActive()}`);
 
     const editors = this.editorViews();
     lines.push(`editors attached: ${editors.length}`);
@@ -689,17 +634,6 @@ class JingyidianSettingTab extends PluginSettingTab {
         t.setValue(this.plugin.settings.dimTitle).onChange(async (v) => {
           await this.set({ dimTitle: v });
         }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.focusedWindowName)
-      .setDesc(this.plugin.t.focusedWindowDesc)
-      .addToggle((t) =>
-        t
-          .setValue(this.plugin.settings.onlyFocusedWindow)
-          .onChange(async (v) => {
-            await this.set({ onlyFocusedWindow: v });
-          }),
       );
 
     containerEl.createEl("h4", { text: this.plugin.t.sectionScope });

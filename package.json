@@ -1,6 +1,6 @@
 {
   "name": "obsidian-desklamp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Room lights off, one lamp left on.",
   "main": "main.js",
   "scripts": {
