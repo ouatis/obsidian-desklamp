@@ -169,6 +169,17 @@ t("clears the debounce timer on unload", () => {
 	assert.ok(src.includes("clearTimeout"), "must clear the debounce timer");
 });
 
+t("ships no real vault paths or project names", () => {
+  // The strings file went out with "03-OUATIS" in an example once. The
+  // placeholder text ships inside a public release, so it stays generic.
+  for (const leak of ["OUATIS", "JARDIN", "LOULOULOU", "笼城", "感应石"]) {
+    assert.ok(!src.includes(leak), `must not mention ${leak}`);
+  }
+  for (const generic of ["novels/", "drafts/"]) {
+    assert.ok(src.includes(generic), `examples should use ${generic}`);
+  }
+});
+
 t("bundle is reasonably small", () => {
 	const kb = Buffer.byteLength(src) / 1024;
 	assert.ok(kb < 60, `bundle is ${kb.toFixed(1)}KB, expected < 60KB`);

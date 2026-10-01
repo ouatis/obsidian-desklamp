@@ -20,7 +20,7 @@ import {
   pathInScope,
   readFocusOverride,
 } from "./engine";
-import { STRINGS } from "./strings";
+import { DEFAULT_LANG, LANGUAGES, type Lang, dict } from "./strings";
 
 /*
  * Phosphor "lamp" — MIT, (c) 2015-present Phosphor
@@ -38,9 +38,11 @@ const LAMP_ON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" f
 interface JingyidianSettings extends EngineConfig, ScopeRules {
   showStatusBar: boolean;
   statusText: string;
+  /** UI language, remembered in the vault. */
+  lang: Lang;
   /** Limit dimming to the window that has OS focus. */
   onlyFocusedWindow: boolean;
-  /** Set once the one-time Stille hand-off has happened. */
+  /** Set once the one-time settings hand-off has happened. */
   migratedFromStille?: boolean;
 }
 
@@ -48,15 +50,9 @@ const DEFAULTS: JingyidianSettings = {
   ...DEFAULT_CONFIG,
   ...DEFAULT_SCOPE,
   showStatusBar: true,
-  statusText: STRINGS.pluginName,
+  statusText: dict(DEFAULT_LANG).pluginName,
+  lang: DEFAULT_LANG,
   onlyFocusedWindow: false,
-};
-
-const GRANULARITY_LABEL: Record<Granularity, string> = {
-  line: STRINGS.gLine,
-  sentence: STRINGS.gSentence,
-  paragraph: STRINGS.gParagraph,
-  section: STRINGS.gSection,
 };
 
 /** Status-bar labels from before the UI moved to English. */
@@ -82,7 +78,7 @@ export default class JingyidianPlugin extends Plugin {
 
     addIcon("dl-lamp-off", LAMP_OFF);
     addIcon("dl-lamp-on", LAMP_ON);
-    this.ribbonEl = this.addRibbonIcon("dl-lamp-off", STRINGS.cmdToggle, () =>
+    this.ribbonEl = this.addRibbonIcon("dl-lamp-off", this.t.cmdToggle, () =>
       this.toggle(),
     );
     this.paintRibbon();
@@ -91,13 +87,13 @@ export default class JingyidianPlugin extends Plugin {
 
     this.addCommand({
       id: "toggle",
-      name: STRINGS.cmdToggle,
+      name: this.t.cmdToggle,
       callback: () => this.toggle(),
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "S" }],
     });
     this.addCommand({
       id: "granularity-cycle",
-      name: STRINGS.cmdCycleGranularity,
+      name: this.t.cmdCycle,
       callback: () => this.cycleGranularity(),
       // Alt is unused elsewhere in the plugin, and Obsidian reserves
       // few Mod+Alt chords by default, so this is unlikely to clash.
@@ -105,7 +101,7 @@ export default class JingyidianPlugin extends Plugin {
     });
     this.addCommand({
       id: "focused-window-only",
-      name: STRINGS.cmdFocusedWindow,
+      name: this.t.cmdFocusedWindow,
       callback: () => {
         void this.patch({
           onlyFocusedWindow: !this.settings.onlyFocusedWindow,
@@ -116,7 +112,7 @@ export default class JingyidianPlugin extends Plugin {
 
     this.addCommand({
       id: "diagnose",
-      name: STRINGS.cmdDiagnose,
+      name: this.t.cmdDiagnose,
       callback: () => this.diagnose(),
     });
     this.addSettingTab(new JingyidianSettingTab(this.app, this));
@@ -171,6 +167,22 @@ export default class JingyidianPlugin extends Plugin {
   private onWindowFocus = () => this.syncAllEditors();
   private onWindowBlur = () => this.syncAllEditors();
 
+  /** Strings for the selected UI language. */
+  get t() {
+    return dict(this.settings.lang);
+  }
+
+  /** The granularity's display name, in the selected language. */
+  private gLabel(g: Granularity): string {
+    const t = this.t;
+    return {
+      line: t.gLine,
+      sentence: t.gSentence,
+      paragraph: t.gParagraph,
+      section: t.gSection,
+    }[g];
+  }
+
   /* ----------------------------- settings ----------------------------- */
 
   private async loadSettings() {
@@ -180,7 +192,7 @@ export default class JingyidianPlugin extends Plugin {
     // The status-bar label is user-editable, so only move it off the old
     // Chinese default. Anything the user typed is left alone.
     if (LEGACY_STATUS_LABELS.has(this.settings.statusText)) {
-      this.settings.statusText = STRINGS.pluginName;
+      this.settings.statusText = this.t.pluginName;
     }
   }
 
@@ -197,16 +209,18 @@ export default class JingyidianPlugin extends Plugin {
   }
 
   /**
-   * Adopt the feel of an existing Stille install, once, so the transition
-   * is not a jump from the old default. The explicit flag is required:
-   * comparing dimOpacity against the default cannot distinguish "never
-   * touched" from "deliberately set to the same value", and the second
-   * case would silently reset the user's settings on every launch.
+   * Adopt the opacity from a sibling focus plugin's data.json, once, so
+   * switching over is not a jump from our default.
+   *
+   * The explicit flag is required: comparing dimOpacity against the
+   * default cannot distinguish "never touched" from "deliberately set to
+   * the same value", and the second case would silently reset the user's
+   * settings on every launch.
    */
   private async migrateFromStille() {
     if (this.settings.migratedFromStille) return;
-    // Mark it done regardless of whether Stille is installed, so we do
-    // not probe the disk on every start.
+    // Mark it done regardless of whether anything was found, so we do not
+    // probe the disk on every start.
     this.settings.migratedFromStille = true;
 
     const legacy = await this.readStilleSettings();
@@ -220,9 +234,9 @@ export default class JingyidianPlugin extends Plugin {
     if (typeof legacy.unfocusTitle === "boolean") {
       this.settings.dimTitle = legacy.unfocusTitle;
     }
-    this.settings.granularity = "line"; // Stille's behaviour, to start from
+    this.settings.granularity = "line"; // the safest default to land on
     await this.save();
-    new Notice(STRINGS.noticeMigrated);
+    new Notice(this.t.noticeMigrated);
   }
 
   private async readStilleSettings(): Promise<{
@@ -237,7 +251,7 @@ export default class JingyidianPlugin extends Plugin {
         unfocusTitle?: boolean;
       };
     } catch {
-      return null; // Stille not installed — nothing to migrate
+      return null; // nothing to inherit from
     }
   }
 
@@ -320,7 +334,7 @@ export default class JingyidianPlugin extends Plugin {
    * not, and a global "blocked" message would be wrong most of the time.
    */
   private blockedReason(): string | null {
-    if (!this.settings.enabled) return STRINGS.statusNotEnabled;
+    if (!this.settings.enabled) return this.t.notOn;
     return null;
   }
 
@@ -418,9 +432,7 @@ export default class JingyidianPlugin extends Plugin {
 
     lines.push(`plugin loaded: v${this.manifest.version}`);
     lines.push(`master switch enabled: ${this.settings.enabled}`);
-    lines.push(
-      `global granularity: ${GRANULARITY_LABEL[this.settings.granularity]}`,
-    );
+    lines.push(`global granularity: ${this.gLabel(this.settings.granularity)}`);
     lines.push(`opacity: ${this.settings.dimOpacity}`);
     lines.push(`current note: ${file}`);
 
@@ -473,7 +485,7 @@ export default class JingyidianPlugin extends Plugin {
     const text = lines.join("\n");
     new Notice(text.split("\n").slice(-1)[0], 8000);
     // eslint-disable-next-line no-console
-    console.log(STRINGS.logPrefix + " diagnostic report\n" + text);
+    console.log(this.t.logPrefix + " diagnostic report\n" + text);
   }
 
   /* --------------------------- status bar ---------------------------- */
@@ -490,7 +502,7 @@ export default class JingyidianPlugin extends Plugin {
     this.ribbonEl.toggleClass("dl-lamp-lit", on);
     this.ribbonEl.setAttribute(
       "aria-label",
-      on ? STRINGS.ribbonOn : STRINGS.ribbonOff,
+      on ? this.t.ribbonOn : this.t.ribbonOff,
     );
   }
 
@@ -528,11 +540,9 @@ export default class JingyidianPlugin extends Plugin {
     // actually darking lines, and if not, why.
     this.statusBarEl.setText(
       `${this.settings.statusText} ${
-        lit ? "on" : "off"
-      } · ${GRANULARITY_LABEL[effective]}${
-        effective !== this.settings.granularity
-          ? ` ${STRINGS.statusPerNote}`
-          : ""
+        lit ? this.t.on : this.t.off
+      } · ${this.gLabel(effective)}${
+        effective !== this.settings.granularity ? ` ${this.t.perNote}` : ""
       }${reason ? ` · ${reason}` : ""}`,
     );
     this.statusBarEl.toggleClass("is-active", lit);
@@ -571,15 +581,25 @@ class JingyidianSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h3", { text: STRINGS.settingTitle });
+    containerEl.createEl("h3", { text: this.plugin.t.pluginName });
     containerEl.createEl("p", {
-      text: STRINGS.settingTagline,
+      text: this.plugin.t.tagline,
       cls: "setting-item-description",
     });
 
     new Setting(containerEl)
-      .setName(STRINGS.toggleName)
-      .setDesc(STRINGS.toggleDesc)
+      .setName(this.plugin.t.languageName)
+      .setDesc(this.plugin.t.languageDesc)
+      .addDropdown((d) => {
+        for (const l of LANGUAGES) d.addOption(l.id, `${l.flag}  ${l.label}`);
+        d.setValue(this.plugin.settings.lang).onChange(async (v) => {
+          await this.set({ lang: v as Lang });
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(this.plugin.t.toggleName)
+      .setDesc(this.plugin.t.toggleDesc)
       .addToggle((t) =>
         t.setValue(this.plugin.settings.enabled).onChange(async (v) => {
           await this.set({ enabled: v });
@@ -587,14 +607,14 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.granularityName)
-      .setDesc(STRINGS.granularityDesc)
+      .setName(this.plugin.t.granularityName)
+      .setDesc(this.plugin.t.granularityDesc)
       .addDropdown((d) =>
         d
-          .addOption("line", STRINGS.gLine)
-          .addOption("sentence", STRINGS.gSentence)
-          .addOption("paragraph", STRINGS.gParagraph)
-          .addOption("section", STRINGS.gSection)
+          .addOption("line", this.plugin.t.gLine)
+          .addOption("sentence", this.plugin.t.gSentence)
+          .addOption("paragraph", this.plugin.t.gParagraph)
+          .addOption("section", this.plugin.t.gSection)
           .setValue(this.plugin.settings.granularity)
           .onChange(async (v) => {
             await this.set({ granularity: v as Granularity });
@@ -602,8 +622,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.opacityName)
-      .setDesc(STRINGS.opacityDesc)
+      .setName(this.plugin.t.opacityName)
+      .setDesc(this.plugin.t.opacityDesc)
       .addSlider((s) =>
         s
           .setLimits(0, 1, 0.05)
@@ -616,8 +636,8 @@ class JingyidianSettingTab extends PluginSettingTab {
 
     if (this.plugin.settings.granularity === "section") {
       new Setting(containerEl)
-        .setName(STRINGS.sectionLevelName)
-        .setDesc(STRINGS.sectionLevelDesc)
+        .setName(this.plugin.t.sectionLevelName)
+        .setDesc(this.plugin.t.sectionLevelDesc)
         .addSlider((s) =>
           s
             .setLimits(1, 6, 1)
@@ -631,8 +651,8 @@ class JingyidianSettingTab extends PluginSettingTab {
 
     if (this.plugin.settings.granularity === "section") {
       new Setting(containerEl)
-        .setName(STRINGS.keepHeadingName)
-        .setDesc(STRINGS.keepHeadingDesc)
+        .setName(this.plugin.t.keepHeadingName)
+        .setDesc(this.plugin.t.keepHeadingDesc)
         .addToggle((t) =>
           t.setValue(this.plugin.settings.keepHeading).onChange(async (v) => {
             await this.set({ keepHeading: v });
@@ -641,8 +661,8 @@ class JingyidianSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName(STRINGS.exemptRichName)
-      .setDesc(STRINGS.exemptRichDesc)
+      .setName(this.plugin.t.exemptRichName)
+      .setDesc(this.plugin.t.exemptRichDesc)
       .addToggle((t) =>
         t.setValue(this.plugin.settings.exemptRich).onChange(async (v) => {
           await this.set({ exemptRich: v });
@@ -650,8 +670,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.transitionName)
-      .setDesc(STRINGS.transitionDesc)
+      .setName(this.plugin.t.transitionName)
+      .setDesc(this.plugin.t.transitionDesc)
       .addSlider((s) =>
         s
           .setLimits(0, 500, 10)
@@ -663,8 +683,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.dimTitleName)
-      .setDesc(STRINGS.dimTitleDesc)
+      .setName(this.plugin.t.dimTitleName)
+      .setDesc(this.plugin.t.dimTitleDesc)
       .addToggle((t) =>
         t.setValue(this.plugin.settings.dimTitle).onChange(async (v) => {
           await this.set({ dimTitle: v });
@@ -672,8 +692,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.focusedWindowName)
-      .setDesc(STRINGS.focusedWindowDesc)
+      .setName(this.plugin.t.focusedWindowName)
+      .setDesc(this.plugin.t.focusedWindowDesc)
       .addToggle((t) =>
         t
           .setValue(this.plugin.settings.onlyFocusedWindow)
@@ -682,11 +702,11 @@ class JingyidianSettingTab extends PluginSettingTab {
           }),
       );
 
-    containerEl.createEl("h4", { text: STRINGS.sectionScope });
+    containerEl.createEl("h4", { text: this.plugin.t.sectionScope });
 
     new Setting(containerEl)
-      .setName(STRINGS.onlyPathsName)
-      .setDesc(STRINGS.onlyPathsDesc)
+      .setName(this.plugin.t.onlyPathsName)
+      .setDesc(this.plugin.t.onlyPathsDesc)
       .addTextArea((t) =>
         t
           .setValue(this.plugin.settings.onlyPaths.join("\n"))
@@ -696,8 +716,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.exceptPathsName)
-      .setDesc(STRINGS.exceptPathsDesc)
+      .setName(this.plugin.t.exceptPathsName)
+      .setDesc(this.plugin.t.exceptPathsDesc)
       .addTextArea((t) =>
         t
           .setValue(this.plugin.settings.exceptPaths.join("\n"))
@@ -707,8 +727,8 @@ class JingyidianSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName(STRINGS.frontmatterKeyName)
-      .setDesc(STRINGS.frontmatterKeyDesc)
+      .setName(this.plugin.t.frontmatterKeyName)
+      .setDesc(this.plugin.t.frontmatterKeyDesc)
       .addText((t) =>
         t
           .setPlaceholder("focus")
@@ -718,19 +738,23 @@ class JingyidianSettingTab extends PluginSettingTab {
           }),
       );
 
-    containerEl.createEl("h4", { text: STRINGS.sectionStatusBar });
+    containerEl.createEl("h4", { text: this.plugin.t.sectionStatusBar });
 
-    new Setting(containerEl).setName(STRINGS.showStatusBarName).addToggle((t) =>
-      t.setValue(this.plugin.settings.showStatusBar).onChange(async (v) => {
-        await this.set({ showStatusBar: v });
-      }),
-    );
+    new Setting(containerEl)
+      .setName(this.plugin.t.showStatusBar)
+      .addToggle((t) =>
+        t.setValue(this.plugin.settings.showStatusBar).onChange(async (v) => {
+          await this.set({ showStatusBar: v });
+        }),
+      );
 
-    new Setting(containerEl).setName(STRINGS.statusTextName).addText((t) =>
-      t.setValue(this.plugin.settings.statusText).onChange(async (v) => {
-        await this.set({ statusText: v });
-      }),
-    );
+    new Setting(containerEl)
+      .setName(this.plugin.t.statusTextName)
+      .addText((t) =>
+        t.setValue(this.plugin.settings.statusText).onChange(async (v) => {
+          await this.set({ statusText: v });
+        }),
+      );
   }
 }
 

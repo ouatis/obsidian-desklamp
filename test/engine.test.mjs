@@ -469,5 +469,15 @@ t("scope: a granularity override does not remove the note from scope", () => {
 	assert.equal(pathInScope("a.md", r, "section"), true);
 });
 
+t("override: CJK names work regardless of UI language", () => {
+  // Japanese users get the same frontmatter keys; 小節 is the kanji form
+  // of the Chinese 小节 and is what a Japanese writer would type.
+  assert.equal(readFocusOverride("小節"), "section", "traditional 節");
+  assert.equal(readFocusOverride("節"), "section", "traditional short 節");
+  assert.equal(readFocusOverride("小节"), "section", "simplified 节");
+  assert.equal(readFocusOverride("行"), "line");
+  assert.equal(readFocusOverride("句"), "sentence");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

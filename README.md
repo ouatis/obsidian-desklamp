@@ -7,41 +7,20 @@ or section you are working on.
 
 > 中文：把注意力收回到你正在写的那一段。详细说明见[文末](#中文说明)。
 
-## Why not just Stille?
+## How it works
 
-Stille inserts a `<style>` element, puts a class on `<body>`, and dims every
-line that is not `.cm-active`. That works, but the approach caps what the
-plugin can ever do:
+Desk Lamp uses a CodeMirror 6 `ViewPlugin` with line decorations. The lit set
+is computed from `EditorState` on every selection change, and only the
+*visible* lines outside it get a decoration class.
 
-1. **Line granularity only.** `.cm-active` is CodeMirror's marker for the
-   caret's line; there is no way to express "paragraph" or "section" with it.
-2. **The CSS variable is written on `<body>`**, so it leaks into every other
-   plugin and theme in the vault.
-3. **The class is global**, so split panes, multiple windows and reading view
-   are all out of reach — and disabling the plugin can leave it behind.
-
-Desk Lamp uses a CodeMirror 6 `ViewPlugin` with line decorations instead: the
-lit set is computed from `EditorState`, and only the *visible* lines outside it
-get a decoration class. No global body class, no injected `<style>`, no DOM
-walking.
-
-| | Stille 1.3.4 | Desk Lamp |
-|---|---|---|
-| Granularity | line | line / sentence / paragraph / section |
-| Scope control | none | folders, path exclusion, per-note frontmatter |
-| Reading view | broken | not supported (by choice, see below) |
-| Multi-caret | no | each caret lights its own range |
-| Multi-window | everything dims | optionally only the focused window |
-| Embeds / math / tables | dimmed by mistake | exempt by default |
-| Opacity input | free text, accepts `NaN` | slider |
-| State on restart | always reset | remembered |
-| Engine | CSS + `.cm-active` | CM6 decorations |
+That means no global `<body>` class, no injected `<style>` element, and no DOM
+walking — each editor instance owns its own state, so split panes and multiple
+windows are handled per editor rather than globally.
 
 ## Features
 
-- **Four granularities** — line (as Stille does it), sentence, paragraph (the
-  whole soft-wrapped paragraph), section (up to the next heading of the same
-  level)
+- **Four granularities** — line, sentence, paragraph (the whole
+  soft-wrapped paragraph), section (up to the next heading of the same level)
 - **Per-note overrides** — frontmatter `focus: false` switches a note off;
   `focus: section` pins its granularity without touching anything else.
   Chinese granularity names work too: `行` / `句` / `段落` / `小节`
@@ -51,7 +30,7 @@ walking.
 - **Opacity slider** 0–1, and a 0–500 ms transition that respects
   `prefers-reduced-motion`
 - **Ribbon icon** shows the state: outline when off, filled when on
-- Migrates the opacity you had in Stille, so switching over is not a jump
+- Adopts the opacity from a previously installed focus plugin, so switching over is not a jump
 
 ### Where it stops
 
@@ -126,7 +105,7 @@ from [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT). See
 
 **小台灯**：房间大灯关掉，只留一盏。
 
-- **四档粒度**：行（同 Stille）、句、段落、小节
+- **四档粒度**：行、句、段落、小节
 - **单篇覆盖**：frontmatter 写 `focus: false` 关闭这一篇；写 `focus: section`
   或 `focus: 小节` 为这一篇单独指定粒度，不影响其他笔记
 - **范围规则**：按文件夹限定、排除指定路径
