@@ -3,7 +3,7 @@
 	"name": "Desk Lamp",
 	"version": "0.1.0",
 	"minAppVersion": "1.5.0",
-	"description": "房间大灯关掉，只留一盏。",
+	"description": "Room lights off, one lamp left on.",
 	"author": "SigiL",
 	"authorUrl": "https://github.com/ouatis",
 	"isDesktopOnly": false

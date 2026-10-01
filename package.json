@@ -1,7 +1,7 @@
 {
   "name": "obsidian-desklamp",
   "version": "0.1.0",
-  "description": "房间大灯关掉，只留一盏。",
+  "description": "Room lights off, one lamp left on.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
