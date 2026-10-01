@@ -82,9 +82,9 @@ as a plugin source.
 npm install
 npm run dev         # watch build
 npm run typecheck
-npm test            # 48 engine tests
+npm test            # 49 engine tests
 npm run build       # production build
-npm run test:bundle # 14 smoke tests against the built artifact
+npm run test:bundle # 15 smoke tests against the built artifact
 npm run verify      # all of the above, then install into the vault
 ```
 

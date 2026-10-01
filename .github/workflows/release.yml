@@ -21,6 +21,8 @@ jobs:
         run: npm run typecheck
       - name: Engine tests
         run: npm test
+      - name: Performance probe
+        run: node --experimental-strip-types test/perf.mjs
       - name: Build
         run: npm run build
       - name: Stage a fake vault so the bundle smoke test has a home
