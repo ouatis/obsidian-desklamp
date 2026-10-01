@@ -1,0 +1,7 @@
+# Keep line endings as written on disk. Obsidian plugins ship LF, and the
+# CRLF warnings on every commit are noise.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
