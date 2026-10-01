@@ -1,0 +1,79 @@
+/* 静一点 Jing Yi Dian
+ *
+ * The engine only ever adds the class `dl-dim` to individual lines via
+ * CodeMirror decorations. Everything else — the lit line, the caret, the
+ * focused section — is simply untouched, which is why there is no
+ * "un-dim" rule to keep in sync.
+ */
+
+body.dl-active .cm-editor .dl-dim {
+	opacity: var(--dl-dim, 0.3);
+	transition: opacity var(--dl-transition, 140ms) ease;
+}
+
+/* Rich content stays legible even when its line is dimmed. */
+body.dl-active .cm-editor .dl-dim .internal-embed,
+body.dl-active .cm-editor .dl-dim .cm-embed-block,
+body.dl-active .cm-editor .dl-dim .cm-embed-inline,
+body.dl-active .cm-editor .dl-dim img,
+body.dl-active .cm-editor .dl-dim svg,
+body.dl-active .cm-editor .dl-dim .math-block,
+body.dl-active .cm-editor .dl-dim .math-inline,
+body.dl-active .cm-editor .dl-dim .cm-math-widget,
+body.dl-active .cm-editor .dl-dim .cm-table-widget,
+body.dl-active .cm-editor .dl-dim .table-wrapper {
+	opacity: 1;
+}
+
+/* Title dimming is opt-in and independent of the engine's own state. */
+body.dl-title-dim .view-header-title,
+body.dl-title-dim .inline-title {
+	opacity: var(--dl-dim, 0.3);
+	transition: opacity var(--dl-transition, 140ms) ease;
+}
+
+body.dl-title-dim .view-header-title:hover,
+body.dl-title-dim .inline-title:focus-within {
+	opacity: 1;
+}
+
+/* ----------------------------- ribbon icon ---------------------------- *
+ * When the lamp is lit, tint the icon so it reads at a glance from the
+ * far edge of the screen, and give the swap a short fade. The weight
+ * change alone (outline vs fill) carries most of the signal; colour is
+ * the reinforcement, not the message.
+ */
+
+/* The class sits on the ribbon element itself. Obsidian names that element
+ * .side-dock-ribbon-action and styles the glyph through .svg-icon, so the
+ * colour has to be applied there, not on the button. */
+.side-dock-ribbon-action.dl-lamp-lit .svg-icon {
+	color: var(--text-accent);
+	transition:
+		color 140ms ease,
+		filter 140ms ease;
+	filter: drop-shadow(
+		0 0 5px color-mix(in srgb, var(--text-accent) 45%, transparent)
+	);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.side-dock-ribbon-action.dl-lamp-lit .svg-icon {
+		transition: none;
+		filter: none;
+	}
+}
+
+/* Status bar indicator. */
+body.dl-active .status-bar-item.is-active {
+	color: var(--text-accent);
+}
+
+/* Respect the OS-level motion preference. */
+@media (prefers-reduced-motion: reduce) {
+	body.dl-active .cm-editor .dl-dim,
+	body.dl-title-dim .view-header-title,
+	body.dl-title-dim .inline-title {
+		transition: none;
+	}
+}

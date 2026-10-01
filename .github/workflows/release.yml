@@ -1,0 +1,60 @@
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Engine tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Stage a fake vault so the bundle smoke test has a home
+        run: |
+          mkdir -p fakevault/.obsidian/plugins/desklamp
+          cp main.js fakevault/.obsidian/plugins/desklamp/
+          cp manifest.json styles.css fakevault/.obsidian/plugins/desklamp/
+      - name: Bundle smoke test
+        run: npm run test:bundle
+        env:
+          JY_VAULT: ${{ github.workspace }}/fakevault
+
+  release:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Stage release assets
+        run: |
+          mkdir -p dist
+          cp main.js manifest.json styles.css dist/
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/main.js
+            dist/manifest.json
+            dist/styles.css
+          generate_release_notes: true
