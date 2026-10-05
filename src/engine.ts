@@ -376,13 +376,13 @@ class FocusEngine {
   }
 
   applyVars(cfg: EngineConfig) {
-    const dom = this.view.dom as HTMLElement;
+    const dom = this.view.dom;
     dom.style.setProperty("--dl-dim", String(cfg.dimOpacity));
     dom.style.setProperty("--dl-transition", `${cfg.transitionMs}ms`);
   }
 
   destroy() {
-    const dom = this.view.dom as HTMLElement;
+    const dom = this.view.dom;
     dom.style.removeProperty("--dl-dim");
     dom.style.removeProperty("--dl-transition");
   }
@@ -481,7 +481,7 @@ export function readFocusOverride(value: unknown): Granularity | false | null {
       v === "paragraph" ||
       v === "section"
     ) {
-      return v as Granularity;
+      return v;
     }
     // A granularity spelled in Chinese. Several of these read as ordinary
     // Japanese words too (行 / 句 / 段落 / 小節), so this doubles as the

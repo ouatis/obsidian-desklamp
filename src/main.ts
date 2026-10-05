@@ -86,15 +86,11 @@ export default class JingyidianPlugin extends Plugin {
       id: "toggle",
       name: this.t.cmdToggle,
       callback: () => this.toggle(),
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "S" }],
     });
     this.addCommand({
       id: "granularity-cycle",
       name: this.t.cmdCycle,
       callback: () => this.cycleGranularity(),
-      // Alt is unused elsewhere in the plugin, and Obsidian reserves
-      // few Mod+Alt chords by default, so this is unlikely to clash.
-      hotkeys: [{ modifiers: ["Mod", "Alt"], key: "G" }],
     });
     this.addCommand({
       id: "diagnose",
@@ -163,7 +159,8 @@ export default class JingyidianPlugin extends Plugin {
   /* ----------------------------- settings ----------------------------- */
 
   private async loadSettings() {
-    this.settings = Object.assign({}, DEFAULTS, await this.loadData());
+    const data = (await this.loadData()) as Partial<JingyidianSettings> | null;
+    this.settings = Object.assign({}, DEFAULTS, data ?? {});
     this.settings.dimOpacity = clamp01(this.settings.dimOpacity);
     this.settings.transitionMs = Math.max(0, this.settings.transitionMs || 0);
     // The status-bar label is user-editable, so only move it off the old
@@ -428,9 +425,13 @@ export default class JingyidianPlugin extends Plugin {
     );
 
     const text = lines.join("\n");
+    // The verdict goes to the Notice; the full chain goes to the clipboard
+    // so it can be pasted straight into an issue report. Plugin guidelines
+    // ask plugins to avoid logging to the console.
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(text).catch(() => {});
+    }
     new Notice(text.split("\n").slice(-1)[0], 8000);
-    // eslint-disable-next-line no-console
-    console.log(this.t.logPrefix + " diagnostic report\n" + text);
   }
 
   /* --------------------------- status bar ---------------------------- */
@@ -526,7 +527,7 @@ class JingyidianSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h3", { text: this.plugin.t.pluginName });
+    new Setting(containerEl).setName(this.plugin.t.pluginName).setHeading();
     containerEl.createEl("p", {
       text: this.plugin.t.tagline,
       cls: "setting-item-description",
@@ -573,7 +574,6 @@ class JingyidianSettingTab extends PluginSettingTab {
         s
           .setLimits(0, 1, 0.05)
           .setValue(this.plugin.settings.dimOpacity)
-          .setDynamicTooltip()
           .onChange(async (v) => {
             await this.set({ dimOpacity: v });
           }),
@@ -587,7 +587,6 @@ class JingyidianSettingTab extends PluginSettingTab {
           s
             .setLimits(1, 6, 1)
             .setValue(this.plugin.settings.sectionLevel)
-            .setDynamicTooltip()
             .onChange(async (v) => {
               await this.set({ sectionLevel: v });
             }),
@@ -621,7 +620,6 @@ class JingyidianSettingTab extends PluginSettingTab {
         s
           .setLimits(0, 500, 10)
           .setValue(this.plugin.settings.transitionMs)
-          .setDynamicTooltip()
           .onChange(async (v) => {
             await this.set({ transitionMs: v });
           }),
@@ -636,7 +634,7 @@ class JingyidianSettingTab extends PluginSettingTab {
         }),
       );
 
-    containerEl.createEl("h4", { text: this.plugin.t.sectionScope });
+    new Setting(containerEl).setName(this.plugin.t.sectionScope).setHeading();
 
     new Setting(containerEl)
       .setName(this.plugin.t.onlyPathsName)
@@ -672,7 +670,9 @@ class JingyidianSettingTab extends PluginSettingTab {
           }),
       );
 
-    containerEl.createEl("h4", { text: this.plugin.t.sectionStatusBar });
+    new Setting(containerEl)
+      .setName(this.plugin.t.sectionStatusBar)
+      .setHeading();
 
     new Setting(containerEl)
       .setName(this.plugin.t.showStatusBar)

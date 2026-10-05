@@ -90,7 +90,6 @@ const en = {
     "Desk Lamp: kept the opacity from your previous focus plugin. Change it in settings.",
   ribbonOn: "Desk Lamp: on — click to switch off",
   ribbonOff: "Desk Lamp: off — click to switch on",
-  logPrefix: "[Desk Lamp]",
 };
 
 type Dict = typeof en;
@@ -161,7 +160,6 @@ const zh: Dict = {
   noticeMigrated: "Desk Lamp：已沿用你原来使用的透明度设置，可在设置中调整。",
   ribbonOn: "Desk Lamp：已开启，点击关闭",
   ribbonOff: "Desk Lamp：已关闭，点击开启",
-  logPrefix: "[Desk Lamp]",
 };
 
 const ja: Dict = {
@@ -232,7 +230,6 @@ const ja: Dict = {
     "Desk Lamp：以前のフォーカスプラグインの不透明度を引き継ぎました。設定で変更できます。",
   ribbonOn: "Desk Lamp：オン（クリックでオフ）",
   ribbonOff: "Desk Lamp：オフ（クリックでオン）",
-  logPrefix: "[Desk Lamp]",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, zh, ja };

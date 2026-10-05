@@ -1,7 +1,7 @@
 {
 	"id": "desklamp",
 	"name": "Desk Lamp",
-	"version": "0.4.1",
+	"version": "0.4.2",
 	"minAppVersion": "1.5.0",
 	"description": "Room lights off, one lamp left on.",
 	"author": "SigiL",

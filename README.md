@@ -50,18 +50,19 @@ feature was built, tried, and removed.
 
 ## Commands
 
-| Command | Default |
-|---|---|
-| Turn the lamp on / off | `Ctrl/Cmd + Shift + S` |
-| Cycle granularity | `Ctrl/Cmd + Alt + G` |
-| Diagnose | command palette |
+- **Turn the lamp on / off**
+- **Cycle granularity**
+- **Diagnose: why is nothing dimmed**
 
-Every hotkey is rebindable in Obsidian's keyboard settings. The on/off state is
-remembered across restarts.
+All three live in the command palette. The plugin ships without default
+hotkeys so it cannot collide with yours — assign shortcuts in Obsidian's
+keyboard settings if you want them. The on/off state is remembered across
+restarts.
 
 If the lamp seems to do nothing, run **Diagnose: why is nothing dimmed** — it
 reports the whole chain (switch, granularity, note, scope, editors attached,
-lines actually carrying the decoration class) to the console.
+lines actually carrying the decoration class) onto the clipboard and shows the
+verdict in a notice.
 
 ## Install
 
@@ -109,7 +110,8 @@ from [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT). See
   或 `focus: 小节` 为这一篇单独指定粒度，不影响其他笔记
 - **范围规则**：按文件夹限定、排除指定路径
 - **不暗**：含嵌入块、公式、表格的行始终清晰
-- **快捷键**：`Ctrl/Cmd + Shift + S` 开 / 关，`Ctrl/Cmd + Alt + G` 切换粒度
+- **命令**：开关、切换粒度、诊断，都在命令面板；默认不占用快捷键，
+  避免与你已有的冲突，需要的话在 Obsidian 快捷键设置里自行指定
 
 界面是英文的，这是 Obsidian 插件的惯例。想要某个功能没有，可以自己加——
 插件很小，没有构建负担。
