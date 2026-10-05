@@ -68,13 +68,19 @@ verdict in a notice.
 
 Requires Obsidian 1.5.0 or newer.
 
-Download `main.js`, `manifest.json` and `styles.css` from the
+**From Obsidian:** enable community plugins, then open
+**Settings → Community plugins → Browse** and search for **Desk Lamp**. The
+listing lives at
+[community.obsidian.md/plugins/desklamp](https://community.obsidian.md/plugins/desklamp).
+
+Manual, if you prefer: download `main.js`, `manifest.json` and `styles.css`
+from the
 [latest release](https://github.com/ouatis/obsidian-desklamp/releases) and put
 them in `<vault>/.obsidian/plugins/desklamp/`, then enable it under
 **Settings → Community plugins**.
 
 With [BRAT](https://github.com/thesephist/brats): add `ouatis/obsidian-desklamp`
-as a plugin source.
+as a plugin source (only useful for trying unreleased versions).
 
 ## Development
 
@@ -112,6 +118,10 @@ from [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT). See
 - **不暗**：含嵌入块、公式、表格的行始终清晰
 - **命令**：开关、切换粒度、诊断，都在命令面板；默认不占用快捷键，
   避免与你已有的冲突，需要的话在 Obsidian 快捷键设置里自行指定
+
+**安装**：已上架官方社区插件商店，设置 → 第三方插件 → 浏览，搜
+「Desk Lamp」即可；也可以从 [GitHub Releases](https://github.com/ouatis/obsidian-desklamp/releases)
+手动下载。
 
 界面是英文的，这是 Obsidian 插件的惯例。想要某个功能没有，可以自己加——
 插件很小，没有构建负担。
