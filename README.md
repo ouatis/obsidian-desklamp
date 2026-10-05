@@ -1,21 +1,52 @@
+<div align="center">
+
 # Desk Lamp
 
-**Room lights off, one lamp left on.**
+_Room lights off, one lamp left on._
+
+[Chinese](./README.zh-CN.md) | [Japanese](./README.ja.md)
+
+<a href="https://community.obsidian.md/plugins/desklamp"><img src="img/open-in-obsidian-button.svg" alt="Open Desk Lamp in Obsidian" width="150"></a>
+
+<p>
+  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=c24e24" alt="Latest release">
+  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=e3a33b" alt="Downloads">
+  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=406e40" alt="MIT License">
+</p>
+
+</div>
 
 An Obsidian plugin that dims everything except the line, sentence, paragraph,
 or section you are working on.
 
-> 中文：把注意力收回到你正在写的那一段。详细说明见[文末](#中文说明)。
+The rest of the note falls back at an opacity you set. Granularity can be
+pinned per note through frontmatter, scoped to folders, and lines holding an
+embed, a formula, or a table always stay lit. The on/off state is remembered
+across restarts, and the ribbon icon shows it.
 
-## How it works
+> [!NOTE]
+> Reading view is deliberately not supported. There is no caret there, so the
+> focus has to be guessed from where you last were, and dimming most of a
+> document while you are reading it makes the document harder to read. The
+> feature was built, tried, and removed.
 
-Desk Lamp uses a CodeMirror 6 `ViewPlugin` with line decorations. The lit set
-is computed from `EditorState` on every selection change, and only the
-*visible* lines outside it get a decoration class.
+## Install
 
-That means no global `<body>` class, no injected `<style>` element, and no DOM
-walking — each editor instance owns its own state, so split panes and multiple
-windows are handled per editor rather than globally.
+Requires Obsidian 1.5.0 or newer.
+
+**From Obsidian:** enable community plugins, then open
+**Settings → Community plugins → Browse** and search for **Desk Lamp**. The
+listing lives at
+[community.obsidian.md/plugins/desklamp](https://community.obsidian.md/plugins/desklamp).
+
+Manual, if you prefer: download `main.js`, `manifest.json` and `styles.css`
+from the
+[latest release](https://github.com/ouatis/obsidian-desklamp/releases) and put
+them in `<vault>/.obsidian/plugins/desklamp/`, then enable it under
+**Settings → Community plugins**.
+
+With [BRAT](https://github.com/thesephist/brats): add `ouatis/obsidian-desklamp`
+as a plugin source (only useful for trying unreleased versions).
 
 ## Features
 
@@ -43,11 +74,6 @@ Sentence splitting handles CJK and Western punctuation and avoids the usual
 traps: the dot in `3.14`, abbreviations like `Mr.` and `e.g.`, single initials
 like `J. R.`, and treating `...` as one boundary rather than three.
 
-**Reading view is deliberately not supported.** There is no caret there, so the
-focus has to be guessed from where you last were, and dimming most of a
-document while you are reading it makes the document harder to read. The
-feature was built, tried, and removed.
-
 ## Commands
 
 - **Turn the lamp on / off**
@@ -56,31 +82,22 @@ feature was built, tried, and removed.
 
 All three live in the command palette. The plugin ships without default
 hotkeys so it cannot collide with yours — assign shortcuts in Obsidian's
-keyboard settings if you want them. The on/off state is remembered across
-restarts.
+keyboard settings if you want them.
 
 If the lamp seems to do nothing, run **Diagnose: why is nothing dimmed** — it
 reports the whole chain (switch, granularity, note, scope, editors attached,
 lines actually carrying the decoration class) onto the clipboard and shows the
 verdict in a notice.
 
-## Install
+## How it works
 
-Requires Obsidian 1.5.0 or newer.
+Desk Lamp uses a CodeMirror 6 `ViewPlugin` with line decorations. The lit set
+is computed from `EditorState` on every selection change, and only the
+*visible* lines outside it get a decoration class.
 
-**From Obsidian:** enable community plugins, then open
-**Settings → Community plugins → Browse** and search for **Desk Lamp**. The
-listing lives at
-[community.obsidian.md/plugins/desklamp](https://community.obsidian.md/plugins/desklamp).
-
-Manual, if you prefer: download `main.js`, `manifest.json` and `styles.css`
-from the
-[latest release](https://github.com/ouatis/obsidian-desklamp/releases) and put
-them in `<vault>/.obsidian/plugins/desklamp/`, then enable it under
-**Settings → Community plugins**.
-
-With [BRAT](https://github.com/thesephist/brats): add `ouatis/obsidian-desklamp`
-as a plugin source (only useful for trying unreleased versions).
+That means no global `<body>` class, no injected `<style>` element, and no DOM
+walking — each editor instance owns its own state, so split panes and multiple
+windows are handled per editor rather than globally.
 
 ## Development
 
@@ -98,30 +115,7 @@ The engine tests import the real functions from `src/engine.ts` and run them
 against real CodeMirror state and the real markdown parser, so they cannot
 drift from the source. `test/perf.mjs` measures the per-keystroke cost.
 
-## Credits
-
-MIT licensed. Inspired by [Stille](https://github.com/michaellee/stille) by
-Michael Lee (MIT, no source reused). The ribbon icon is "Lamp" and "Lamp-fill"
-from [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT). See
-[LICENSE](LICENSE).
-
----
-
-## 中文说明
-
-**小台灯**：房间大灯关掉，只留一盏。
-
-- **四档粒度**：行、句、段落、小节
-- **单篇覆盖**：frontmatter 写 `focus: false` 关闭这一篇；写 `focus: section`
-  或 `focus: 小节` 为这一篇单独指定粒度，不影响其他笔记
-- **范围规则**：按文件夹限定、排除指定路径
-- **不暗**：含嵌入块、公式、表格的行始终清晰
-- **命令**：开关、切换粒度、诊断，都在命令面板；默认不占用快捷键，
-  避免与你已有的冲突，需要的话在 Obsidian 快捷键设置里自行指定
-
-**安装**：已上架官方社区插件商店，设置 → 第三方插件 → 浏览，搜
-「Desk Lamp」即可；也可以从 [GitHub Releases](https://github.com/ouatis/obsidian-desklamp/releases)
-手动下载。
-
-界面是英文的，这是 Obsidian 插件的惯例。想要某个功能没有，可以自己加——
-插件很小，没有构建负担。
+Created by [@ouatis](https://github.com/ouatis). Inspired by
+[Stille](https://github.com/michaellee/stille) by Michael Lee. Ribbon icon from
+[Phosphor Icons](https://phosphoricons.com). Third-party notices:
+[NOTICE.md](NOTICE.md).
