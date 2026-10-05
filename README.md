@@ -83,7 +83,7 @@ npm run dev         # watch build
 npm run typecheck
 npm test            # 49 engine tests
 npm run build       # production build
-npm run test:bundle # 16 smoke tests against the built artifact
+npm run test:bundle # 17 smoke tests against the built artifact
 npm run verify      # all of the above, then install into the vault
 ```
 

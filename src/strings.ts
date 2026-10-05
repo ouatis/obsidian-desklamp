@@ -27,7 +27,7 @@ const en = {
 
   languageName: "Language",
   languageDesc:
-    "Language for the settings and the status bar. CJK granularity names in frontmatter (行 / 句 / 段落 / 小節) keep working either way.",
+    "Language for the settings and the status bar. Frontmatter accepts the English names (line / sentence / paragraph / section) in any language; the Chinese and Japanese ones work too.",
   tagline: "Room lights off, one lamp left on.",
 
   sectionScope: "Scope",
@@ -169,14 +169,14 @@ const ja: Dict = {
 
   languageName: "表示言語",
   languageDesc:
-    "設定画面とステータスバーで使う言語。frontmatter の中国語の粒度名（行 / 句 / 段落 / 小節）は、どの言語でも使えます。",
-  tagline: " 主灯を消して、小灯を一つだけ。",
+    "設定画面とステータスバーで使う言語。frontmatter には英語名（line / sentence / paragraph / section）か中国語名を書けます。",
+  tagline: "主灯を消して、小灯を一つだけ。",
 
   sectionScope: "適用範囲",
   sectionStatusBar: "ステータスバー",
 
   cmdToggle: "ランプをオン / オフ",
-  cmdCycle: "粒度を切替：行 → 句 → 段落 → 小節",
+  cmdCycle: "粒度を切替：行 → センテンス → 段落 → 小節",
   cmdDiagnose: "診断：なぜ暗くならないのか",
 
   toggleName: "ランプ",
@@ -184,7 +184,7 @@ const ja: Dict = {
 
   granularityName: "粒度",
   granularityDesc:
-    "行はカーソルのある行だけ。句は現在の文のある行を点けます。段落はソフトラップされた段落全体。小節は同レベルの見出しまで。",
+    "行はカーソルのある行だけ。センテンスは現在の文のある行を点けます。段落はソフトラップされた段落全体。小節は同レベルの見出しまで。",
 
   opacityName: "非フォーカス部分の不透明度",
   opacityDesc: "0 は真っ黒、1 は暗くしません。",
@@ -219,14 +219,14 @@ const ja: Dict = {
   statusTextName: "ステータスバーの文字",
 
   gLine: "行",
-  gSentence: "句",
+  gSentence: "センテンス",
   gParagraph: "段落",
   gSection: "小節",
 
   on: "オン",
   off: "オフ",
   perNote: "（このノート）",
-  notOn: "オフ",
+  notOn: "消灯",
 
   noticeMigrated:
     "Desk Lamp：以前のフォーカスプラグインの不透明度を引き継ぎました。設定で変更できます。",
