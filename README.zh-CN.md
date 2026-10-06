@@ -9,9 +9,9 @@ _房间大灯关掉，只留一盏。_
 <a href="https://community.obsidian.md/plugins/desklamp"><img src="img/open-in-obsidian-button.svg" alt="在 Obsidian 中打开 Desk Lamp" width="150"></a>
 
 <p>
-  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=c24e24" alt="Latest release">
-  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=e3a33b" alt="Downloads">
-  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=406e40" alt="MIT License">
+  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=ad3e32" alt="Latest release">
+  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=d0a85c" alt="Downloads">
+  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=2f6754" alt="MIT License">
 </p>
 
 </div>
