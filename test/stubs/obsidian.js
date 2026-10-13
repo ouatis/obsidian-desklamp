@@ -7,7 +7,7 @@ class Plugin {
 	}
 	addRibbonIcon() {}
 	addStatusBarItem() {
-		return { setText() {}, toggleClass() {}, remove() {} };
+		return { addClass() {}, setText() {}, toggleClass() {}, remove() {} };
 	}
 	addCommand() {}
 	addSettingTab() {}

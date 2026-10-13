@@ -17,6 +17,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Dependency audit
+        run: npm run audit:deps
       - name: Typecheck
         run: npm run typecheck
       - name: Engine tests

@@ -9,12 +9,14 @@ _Room lights off, one lamp left on._
 <a href="https://community.obsidian.md/plugins/desklamp"><img src="img/open-in-obsidian-button.svg" alt="Open Desk Lamp in Obsidian" width="150"></a>
 
 <p>
-  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=ad3e32" alt="Latest release">
-  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=d0a85c" alt="Downloads">
-  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=2f6754" alt="MIT License">
+  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=c24e18" alt="Latest release">
+  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=6d665d" alt="Downloads">
+  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=406e40" alt="MIT License">
 </p>
 
 </div>
+
+![Desk Lamp: paper, light and focus. Concept illustration, not a plugin screenshot.](img/cover.svg)
 
 An Obsidian plugin that dims everything except the line, sentence, paragraph,
 or section you are working on.
@@ -23,6 +25,11 @@ The rest of the note falls back at an opacity you set. Granularity can be
 pinned per note through frontmatter, scoped to folders, and lines holding an
 embed, a formula, or a table always stay lit. The on/off state is remembered
 across restarts, and the ribbon icon shows it.
+
+Quiet panels, thin rules and small transitions share a visual rhythm with
+Scriptorium and Skill Switchboard. The interface still follows your Obsidian
+theme's fonts and colors; neither sibling product is required. English is the
+default, with Chinese and Japanese available in settings.
 
 > [!NOTE]
 > Reading view is deliberately not supported. There is no caret there, so the
@@ -95,9 +102,9 @@ Desk Lamp uses a CodeMirror 6 `ViewPlugin` with line decorations. The lit set
 is computed from `EditorState` on every selection change, and only the
 *visible* lines outside it get a decoration class.
 
-That means no global `<body>` class, no injected `<style>` element, and no DOM
-walking — each editor instance owns its own state, so split panes and multiple
-windows are handled per editor rather than globally.
+Each editor instance owns its focus state, so split panes and multiple windows
+are handled per editor rather than globally. Separate UI classes mark the
+optional title dimming, the ribbon and Desk Lamp's own status bar item.
 
 ## Development
 
@@ -105,9 +112,9 @@ windows are handled per editor rather than globally.
 npm install
 npm run dev         # watch build
 npm run typecheck
-npm test            # 49 engine tests
+npm test            # engine tests
 npm run build       # production build
-npm run test:bundle # 17 smoke tests against the built artifact
+npm run test:bundle # smoke tests against the built artifact
 npm run verify      # all of the above, then install into the vault
 ```
 

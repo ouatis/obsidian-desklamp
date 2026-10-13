@@ -237,5 +237,47 @@ t("bundle is reasonably small", () => {
   console.log(`       (${kb.toFixed(1)}KB)`);
 });
 
+t("settings use scoped family shapes and host fonts", () => {
+  const css = fs.readFileSync(path.join(VAULT, ".obsidian", "plugins", manifest.id, "styles.css"), "utf8");
+  assert.ok(src.includes('"dl-settings"'));
+  assert.ok(src.includes('"dl-settings-header"'));
+  assert.match(css, /--dl-control-radius:\s*8px/);
+  assert.match(css, /--dl-panel-radius:\s*12px/);
+  assert.match(css, /font-family:\s*var\(--font-interface\)/);
+  assert.match(css, /@container\s*\(max-width:\s*420px\)/);
+  assert.doesNotMatch(css, /#[\da-f]{3,8}\b|https?:\/\//i);
+});
+
+t("status styling belongs only to Desk Lamp's own item", () => {
+  const plugin = new PluginClass({ workspace: { getActiveViewOfType: () => null } }, manifest);
+  const classes = [];
+  plugin.addStatusBarItem = () => ({ addClass: cls => classes.push(cls), setText() {}, toggleClass() {} });
+  plugin.renderStatusBar();
+  assert.deepEqual(classes, ["dl-status-bar"]);
+  const css = fs.readFileSync(path.join(PROJECT, "styles.css"), "utf8");
+  assert.match(css, /\.status-bar-item\.dl-status-bar\.is-active/);
+  assert.doesNotMatch(css, /body\.dl-active\s+\.status-bar-item\.is-active/);
+});
+
+t("ribbon motion is scoped and still respects reduced motion", () => {
+  const css = fs.readFileSync(path.join(PROJECT, "styles.css"), "utf8");
+  assert.ok(src.includes('"dl-ribbon"'));
+  assert.match(css, /\.dl-ribbon\s+\.svg-icon/);
+  assert.match(css, /transition:\s*color 160ms/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
+  assert.ok(src.includes('"dl-lamp-on"') && src.includes('"dl-lamp-off"'));
+});
+
+t("all three READMEs share one local, accessible concept cover", () => {
+  for (const name of ["README.md", "README.zh-CN.md", "README.ja.md"]) {
+    const readme = fs.readFileSync(path.join(PROJECT, name), "utf8");
+    assert.ok(readme.includes("(img/cover.svg)"), `${name}: missing family cover`);
+  }
+  const cover = fs.readFileSync(path.join(PROJECT, "img", "cover.svg"), "utf8");
+  assert.match(cover, /<title\b/);
+  assert.match(cover, /<desc\b/);
+  assert.doesNotMatch(cover, /<(?:image|script|foreignObject)\b|https?:\/\/(?!www\.w3\.org\/2000\/svg)/i);
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

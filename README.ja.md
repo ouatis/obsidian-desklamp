@@ -9,16 +9,20 @@ _部屋の灯りを消して、一つだけ残す。_
 <a href="https://community.obsidian.md/plugins/desklamp"><img src="img/open-in-obsidian-button.svg" alt="Obsidian で Desk Lamp を開く" width="150"></a>
 
 <p>
-  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=ad3e32" alt="Latest release">
-  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=d0a85c" alt="Downloads">
-  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=2f6754" alt="MIT License">
+  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=c24e18" alt="Latest release">
+  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=6d665d" alt="Downloads">
+  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=406e40" alt="MIT License">
 </p>
 
 </div>
 
+![Desk Lamp：紙、光、フォーカス。プラグインのスクリーンショットではなく、コンセプトイラストです。](img/cover.svg)
+
 書いている行・文・段落・節だけを残し、それ以外はすべて薄暗くする Obsidian プラグイン。
 
 それ以外の部分は設定した不透明度に沈みます。粒度は frontmatter でノート単位に固定でき、適用範囲はフォルダで絞り込めます。埋め込み・数式・表を含む行は決して暗くなりません。オン/オフの状態は再起動後も保持され、リボンのアイコンがそれを示します。
+
+静かなパネル、細い線、短い状態遷移は Scriptorium と Skill Switchboard と共通の視覚リズムです。フォントと配色は Obsidian のテーマに従い、他の二つの製品は必要ありません。既定の表示言語は英語で、設定から中国語または日本語を選べます。
 
 > [!NOTE]
 > 閲覧ビューは意図的に非対応です。閲覧時にはカーソルがないため、フォーカスは前回の位置からの推測になりますし、読んでいる文書の大部分を暗くしては読みにくくなるだけです。この機能は実装し、試し、削除しました。
@@ -70,7 +74,7 @@ CodeMirror の行デコレーションは**行単位**です。センテンス�
 
 Desk Lamp は CodeMirror 6 の `ViewPlugin` で行デコレーションを行います。点灯範囲は選択範囲が変わるたびに `EditorState` から計算され、装飾クラスが付くのは*可視範囲内*の点灯範囲外の行だけです。
 
-つまり、グローバルな `<body>` クラスも、注入された `<style>` 要素も、DOM 走査もありません——各エディタが自分の状態を持つため、分割ペインや複数ウィンドウでもエディタ単位で正しく動きます。
+各エディタが自分のフォーカス状態を持つため、分割ペインや複数ウィンドウでもエディタ単位で動きます。任意のタイトル調光、リボン、Desk Lamp 自身のステータスバー項目には、それぞれ別の UI クラスを使います。
 
 ## 開発
 
@@ -78,9 +82,9 @@ Desk Lamp は CodeMirror 6 の `ViewPlugin` で行デコレーションを行い
 npm install
 npm run dev         # ウォッチビルド
 npm run typecheck
-npm test            # 49 個のエンジン テスト
+npm test            # エンジンテスト
 npm run build       # 本番ビルド
-npm run test:bundle # ビルド成果物に対する 17 個のスモークテスト
+npm run test:bundle # ビルド成果物に対するスモークテスト
 npm run verify      # 以上すべて、その後に vault へインストール
 ```
 

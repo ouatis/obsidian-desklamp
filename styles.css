@@ -47,26 +47,134 @@ body.dl-title-dim .inline-title:focus-within {
 /* The class sits on the ribbon element itself. Obsidian names that element
  * .side-dock-ribbon-action and styles the glyph through .svg-icon, so the
  * colour has to be applied there, not on the button. */
-.side-dock-ribbon-action.dl-lamp-lit .svg-icon {
+.side-dock-ribbon-action.dl-ribbon .svg-icon {
+	transition: color 160ms ease;
+}
+
+.side-dock-ribbon-action.dl-ribbon.dl-lamp-lit .svg-icon {
 	color: var(--text-accent);
-	transition:
-		color 140ms ease,
-		filter 140ms ease;
-	filter: drop-shadow(
-		0 0 5px color-mix(in srgb, var(--text-accent) 45%, transparent)
-	);
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.side-dock-ribbon-action.dl-lamp-lit .svg-icon {
+	.side-dock-ribbon-action.dl-ribbon .svg-icon {
 		transition: none;
-		filter: none;
 	}
 }
 
 /* Status bar indicator. */
-body.dl-active .status-bar-item.is-active {
+.status-bar-item.dl-status-bar.is-active {
 	color: var(--text-accent);
+}
+
+/* Quiet family shapes; the host still owns fonts, surfaces and accents. */
+.dl-settings {
+	--dl-control-radius: 8px;
+	--dl-panel-radius: 12px;
+	container-type: inline-size;
+	font-family: var(--font-interface);
+	color: var(--text-normal);
+}
+
+.dl-settings .dl-settings-header {
+	align-items: center;
+	background: var(--background-secondary);
+	background: color-mix(in srgb, var(--background-secondary) 35%, var(--background-primary));
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--dl-panel-radius);
+	display: grid;
+	gap: 12px;
+	grid-template-columns: 40px minmax(0, 1fr);
+	margin-bottom: 16px;
+	padding: 16px;
+}
+
+.dl-settings .dl-settings-lamp {
+	align-items: center;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--dl-control-radius);
+	color: var(--text-muted);
+	display: flex;
+	height: 40px;
+	justify-content: center;
+	width: 40px;
+}
+
+.dl-settings .dl-settings-lamp.is-on {
+	color: var(--text-accent);
+}
+
+.dl-settings .dl-settings-lamp svg {
+	height: 24px;
+	width: 24px;
+}
+
+.dl-settings .dl-settings-heading .setting-item {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.dl-settings .dl-settings-heading .setting-item-name {
+	font-size: 20px;
+	line-height: 1.35;
+}
+
+.dl-settings .dl-settings-tagline {
+	margin: 4px 0 0;
+}
+
+.dl-settings > .setting-item {
+	padding: 12px 0;
+}
+
+.dl-settings > .setting-item.mod-heading {
+	padding-top: 24px;
+}
+
+.dl-settings .setting-item-info {
+	min-width: 0;
+}
+
+.dl-settings .setting-item-description {
+	color: var(--text-muted);
+	line-height: 1.5;
+}
+
+.dl-settings .setting-item-control {
+	gap: 8px;
+}
+
+.dl-settings :is(select, input[type="text"], textarea, button) {
+	border-radius: var(--dl-control-radius);
+	max-width: 100%;
+}
+
+.dl-settings textarea {
+	min-height: 96px;
+	resize: vertical;
+}
+
+.dl-settings :is(select, input, textarea, button):focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+@container (max-width: 420px) {
+	.dl-settings > .setting-item:not(.mod-heading) {
+		align-items: stretch;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.dl-settings .setting-item-control {
+		justify-content: flex-end;
+		margin: 0;
+		width: 100%;
+	}
+
+	.dl-settings textarea {
+		width: 100%;
+	}
 }
 
 /* Respect the OS-level motion preference. */

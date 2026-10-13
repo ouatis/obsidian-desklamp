@@ -78,6 +78,7 @@ export default class JingyidianPlugin extends Plugin {
     this.ribbonEl = this.addRibbonIcon("dl-lamp-off", this.t.cmdToggle, () =>
       this.toggle(),
     );
+    this.ribbonEl.addClass("dl-ribbon");
     this.paintRibbon();
 
     this.registerEditorExtension(focusExtension());
@@ -475,6 +476,7 @@ export default class JingyidianPlugin extends Plugin {
     // re-creates exactly one item rather than stacking them.
     if (!this.statusBarEl) {
       this.statusBarEl = this.addStatusBarItem();
+      this.statusBarEl.addClass("dl-status-bar");
     }
     const reason = this.blockedReason();
     const lit = reason === null;
@@ -526,11 +528,18 @@ class JingyidianSettingTab extends PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
+    containerEl.addClass("dl-settings");
 
-    new Setting(containerEl).setName(this.plugin.t.pluginName).setHeading();
-    containerEl.createEl("p", {
+    const header = containerEl.createDiv("dl-settings-header");
+    const lamp = header.createDiv("dl-settings-lamp");
+    lamp.setAttribute("aria-hidden", "true");
+    lamp.toggleClass("is-on", this.plugin.settings.enabled);
+    setIcon(lamp, this.plugin.settings.enabled ? "dl-lamp-on" : "dl-lamp-off");
+    const heading = header.createDiv("dl-settings-heading");
+    new Setting(heading).setName(this.plugin.t.pluginName).setHeading();
+    heading.createEl("p", {
       text: this.plugin.t.tagline,
-      cls: "setting-item-description",
+      cls: "setting-item-description dl-settings-tagline",
     });
 
     new Setting(containerEl)

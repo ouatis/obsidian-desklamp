@@ -9,16 +9,20 @@ _房间大灯关掉，只留一盏。_
 <a href="https://community.obsidian.md/plugins/desklamp"><img src="img/open-in-obsidian-button.svg" alt="在 Obsidian 中打开 Desk Lamp" width="150"></a>
 
 <p>
-  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=ad3e32" alt="Latest release">
-  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=d0a85c" alt="Downloads">
-  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=2f6754" alt="MIT License">
+  <img src="https://img.shields.io/github/v/release/ouatis/obsidian-desklamp?style=flat-square&label=version&color=c24e18" alt="Latest release">
+  <img src="https://img.shields.io/github/downloads/ouatis/obsidian-desklamp/total?style=flat-square&logo=obsidian&logoColor=white&label=downloads&color=6d665d" alt="Downloads">
+  <img src="https://img.shields.io/github/license/ouatis/obsidian-desklamp?style=flat-square&label=license&color=406e40" alt="MIT License">
 </p>
 
 </div>
 
+![小台灯：纸、光与焦点。这是概念插画，不是插件截图。](img/cover.svg)
+
 一款 Obsidian 插件：把你正在写的那一行、那一句、那一段或那一节留下，其余全部调暗。
 
 其余内容退到你设定的不透明度。粒度可以用 frontmatter 单篇指定，范围可以按文件夹限定；含嵌入块、公式、表格的行永远清晰。开关状态跨重启记住，丝带图标随明灭。
+
+安静的面板、细线与短促的状态过渡，与 Scriptorium、技能接线台共享视觉节奏。界面字体和颜色仍跟随你的 Obsidian 主题，不要求安装另外两款产品。默认英文，可在设置中选择中文或日文。
 
 > [!NOTE]
 > 刻意不支持阅读视图。阅读时没有光标，焦点只能靠上次的位置去猜；而且读文档时把大半篇调暗，只会更难读。这个功能做过、试过、删掉了。
@@ -73,7 +77,7 @@ Obsidian 的快捷键设置里自行指定。
 Desk Lamp 用 CodeMirror 6 的 `ViewPlugin` 做行级装饰。每次选区变化时从
 `EditorState` 算出亮区，可见范围内、亮区之外的行才挂装饰类。
 
-也就是说：没有全局 `<body>` class，没有注入的 `<style>`，也没有 DOM 遍历——每个编辑器实例自持状态，分屏和多窗口天然各管各的。
+每个编辑器实例自持聚焦状态，分屏和多窗口各管各的。可选的标题调暗、丝带图标和小台灯自己的状态栏项，另用界面样式类标记。
 
 ## 开发
 
@@ -81,9 +85,9 @@ Desk Lamp 用 CodeMirror 6 的 `ViewPlugin` 做行级装饰。每次选区变化
 npm install
 npm run dev         # 监听构建
 npm run typecheck
-npm test            # 49 项引擎测试
+npm test            # 引擎测试
 npm run build       # 生产构建
-npm run test:bundle # 对构建产物跑 17 项冒烟测试
+npm run test:bundle # 对构建产物跑冒烟测试
 npm run verify      # 以上全部，然后装进仓库实测
 ```
 
@@ -95,5 +99,4 @@ markdown 解析器上，所以测试不会与源码漂移。`test/perf.mjs` 测�
 [Phosphor Icons](https://phosphoricons.com)。第三方声明见
 [NOTICE.md](NOTICE.md)。
 
-界面是英文的，这是 Obsidian 插件的惯例。想要某个功能没有，可以自己加——
-插件很小，没有构建负担。
+语言选择会随笔记库保存，后续打开仍使用你选择的语言。

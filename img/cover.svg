@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="cover-title cover-desc">
+  <title id="cover-title">Desk Lamp — room lights off, one lamp left on</title>
+  <desc id="cover-desc">A quiet paper-and-ink illustration. One line on the writing desk stays clear while other lines recede. Concept artwork, not a plugin screenshot.</desc>
+  <style>
+    .paper{fill:#fefcf6}.soft{fill:#f5f0e6}.ink{fill:#201c13}.muted{fill:#6d665d}.rule{stroke:#d8d0c2}.accent{stroke:#c24e18}.line{fill:none;stroke:#201c13;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.serif{font-family:"IBM Plex Serif","Noto Serif SC",Georgia,serif}.mono{font-family:"IBM Plex Mono",Consolas,monospace;font-size:12px;letter-spacing:1.5px}.copy{font-family:"IBM Plex Sans","Noto Sans SC",sans-serif;font-size:15px}
+    @media(prefers-color-scheme:dark){.paper{fill:#29261f}.soft{fill:#201d18}.ink{fill:#f5f0e4}.muted{fill:#b4ad9f}.rule{stroke:#4e473b}.accent{stroke:#eda16c}.line{stroke:#f5f0e4}}
+  </style>
+  <rect width="1200" height="480" class="paper"/>
+  <text x="40" y="36" class="mono muted">OUATIS / OBSIDIAN</text>
+  <text x="1160" y="36" text-anchor="end" class="mono muted">02 / LIGHT</text>
+  <path d="M40 56H1160M40 424H1160" class="rule" fill="none"/>
+  <text x="60" y="160" class="serif ink" font-size="60">Desk Lamp</text>
+  <text x="60" y="224" class="serif ink" font-size="30">Room lights off,</text>
+  <text x="60" y="263" class="serif ink" font-size="30">one lamp left on.</text>
+  <text x="60" y="323" class="copy muted">Keep your place. Let the rest of the note recede.</text>
+  <text x="60" y="374" class="mono muted">PAPER / LIGHT / FOCUS</text>
+  <rect x="628" y="95" width="516" height="285" rx="12" class="soft"/>
+  <rect x="652" y="130" width="400" height="225" rx="8" class="paper"/>
+  <rect x="652" y="130" width="400" height="225" rx="8" fill="none" class="rule"/>
+  <text x="681" y="171" class="serif ink" font-size="21">After the rain</text>
+  <g opacity=".32" class="muted serif" font-size="16">
+    <text x="681" y="208">The room settles. Rain leaves the window.</text>
+    <text x="681" y="283">The next thought can wait a moment.</text>
+    <text x="681" y="317">There is nothing else to turn on.</text>
+  </g>
+  <path d="M670 228V250" class="accent" stroke-width="2"/>
+  <text x="681" y="244" class="serif ink" font-size="17">There is room for one more sentence.</text>
+  <g transform="translate(1055 177)" class="line">
+    <path d="M-28 154H53M5 154V139M-5 139H35M15 139V20L-37-16M-39-19L-59-1L-31 23L-13 5ZM-48 33L-66 48M-30 38L-38 60"/>
+    <circle cx="15" cy="20" r="4" class="paper"/>
+  </g>
+  <text x="40" y="453" class="mono muted">DESK LAMP · WRITING FOCUS</text>
+  <text x="1160" y="453" text-anchor="end" class="copy muted" font-size="12">Concept illustration · not a screenshot</text>
+</svg>
