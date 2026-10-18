@@ -518,3 +518,19 @@ export function pathInScope(
   }
   return false;
 }
+
+/**
+ * Scope decision for a leaf that has no path.
+ *
+ * Obsidian's TextFileView sets allowNoFile = true, so a blank tab keeps its
+ * `file === null` instead of being closed, and main.ts hands the engine "".
+ * That leaf cannot be named by any rule: with no only-list it is in scope
+ * like everything else, but once an only-list exists the list is a
+ * whitelist and "" matches none of it — so it must not dim. Calling
+ * pathInScope("") would answer the same thing by accident ("" matches no
+ * entry), but only because `norm("")` is empty; stating it here keeps the
+ * intent, and the reason, next to the decision.
+ */
+export function pathlessLeafInScope(rules: ScopeRules): boolean {
+  return rules.onlyPaths.length === 0;
+}

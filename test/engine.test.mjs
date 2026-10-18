@@ -14,6 +14,7 @@ import {
 	focusedLinesForTest as focusedLines,
 	focusEngineSpec,
 	pathInScope,
+	pathlessLeafInScope,
 	readFocusOverride,
 	sentenceBoundaries,
 } from "../src/engine.ts";
@@ -467,6 +468,51 @@ t("override: absent or unrecognised falls through to the global setting", () => 
 t("scope: a granularity override does not remove the note from scope", () => {
 	const r = { onlyPaths: [], exceptPaths: [], frontmatterKey: "focus" };
 	assert.equal(pathInScope("a.md", r, "section"), true);
+});
+
+// The pathless leaf. Obsidian's TextFileView sets allowNoFile = true, so a
+// blank tab legitimately keeps file === null, and main.ts hands the engine
+// "". pathInScope("") would answer by accident; pathlessLeafInScope() is the
+// real decision configFor() calls, so that is what these cases drive.
+t("scope: pathless leaf is in scope when no only-list is set", () => {
+	assert.equal(
+		pathlessLeafInScope({ onlyPaths: [], exceptPaths: [], frontmatterKey: "focus" }),
+		true,
+	);
+});
+
+t("scope: pathless leaf is out of scope once an only-list exists", () => {
+	assert.equal(
+		pathlessLeafInScope({
+			onlyPaths: ["10-创作"],
+			exceptPaths: [],
+			frontmatterKey: "focus",
+		}),
+		false,
+		"a blank tab matches no whitelist entry",
+	);
+});
+
+t("scope: an except-list cannot drag the pathless leaf back in", () => {
+	// exceptPaths only narrows, and is irrelevant here: the only-list is
+	// what the pathless leaf fails, so no except entry may rescue it.
+	assert.equal(
+		pathlessLeafInScope({
+			onlyPaths: ["10-创作"],
+			exceptPaths: ["zzz"],
+			frontmatterKey: "focus",
+		}),
+		false,
+	);
+});
+
+t("scope: an only-list holding an empty string is still a whitelist", () => {
+	// A stray empty entry from a hand-edited data.json must not be read as
+	// "no only-list", which would silently dim every note again.
+	assert.equal(
+		pathlessLeafInScope({ onlyPaths: [""], exceptPaths: [], frontmatterKey: "focus" }),
+		false,
+	);
 });
 
 t("override: CJK names work regardless of UI language", () => {

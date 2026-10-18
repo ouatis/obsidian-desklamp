@@ -18,6 +18,7 @@ import {
   applyConfigTo,
   focusExtension,
   pathInScope,
+  pathlessLeafInScope,
   readFocusOverride,
 } from "./engine";
 import { DEFAULT_LANG, LANGUAGES, type Lang, dict } from "./strings";
@@ -233,8 +234,15 @@ export default class JingyidianPlugin extends Plugin {
   /* ------------------------------ engine ------------------------------ */
 
   /**
-   * Config for one editor. `filePath` is "" for a leaf with no file yet
-   * (a fresh empty note), which has no scope rules to check.
+   * Config for one editor. `filePath` is "" for a leaf with no file — a
+   * blank tab, or a note Obsidian has not put on disk yet. Obsidian's
+   * TextFileView sets allowNoFile = true, so such a leaf is allowed to
+   * exist and its `.file` really is null.
+   *
+   * With no `onlyPaths` every note is in scope, so an empty leaf dims like
+   * any other. Once `onlyPaths` is set the list is a whitelist, and a
+   * pathless leaf matches none of it — treating it as in scope would dim
+   * the one editor that can never be named by a rule.
    */
   private configFor(filePath: string): EngineConfig {
     const fmValue =
@@ -242,7 +250,11 @@ export default class JingyidianPlugin extends Plugin {
     const override = readFocusOverride(fmValue);
     const inScope =
       filePath === ""
-        ? true
+        ? pathlessLeafInScope({
+            onlyPaths: this.settings.onlyPaths,
+            exceptPaths: this.settings.exceptPaths,
+            frontmatterKey: this.settings.frontmatterKey,
+          })
         : pathInScope(
             filePath,
             {
