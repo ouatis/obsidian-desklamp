@@ -548,3 +548,36 @@ export function pathInScope(
 export function pathlessLeafInScope(rules: ScopeRules): boolean {
   return rules.onlyPaths.length === 0;
 }
+
+/**
+ * Keys that sit in data.json, are read back on every load and written again
+ * on every save, and mean nothing. `readingView: true` is the one that
+ * costs the user: it reads like the feature is on, and reading view was
+ * built, tried and removed.
+ *
+ * Deliberately NOT here: `onlyFocusedWindow`. It is equally dead, but
+ * d605562 removed it and added a smoke guard that fails if that name
+ * reappears in the bundle, precisely to keep it from coming back as an
+ * unused setting. Cleaning it from the file would mean naming it again, so
+ * it stays — the guard's intent outranks one leftover key, which is inert.
+ */
+export const DEAD_SETTING_KEYS = [
+  "readingView",
+  "rememberState",
+  "debugReading",
+] as const;
+
+/**
+ * The keys in `saved` that nothing reads any more, or [] when there are
+ * none. Returning the list instead of mutating keeps the caller in charge
+ * of when to write, and lets a test assert exactly what would be dropped.
+ */
+export function deadSettingKeys(saved: object): string[] {
+  if (saved === null || typeof saved !== "object") return [];
+  const record = saved as Record<string, unknown>;
+  // hasOwnProperty, not `in`: `in` would also see the prototype chain, and
+  // "constructor" or "toString" are always there.
+  return DEAD_SETTING_KEYS.filter((key) =>
+    Object.prototype.hasOwnProperty.call(record, key),
+  );
+}

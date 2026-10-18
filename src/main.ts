@@ -16,6 +16,7 @@ import {
   Granularity,
   ScopeRules,
   applyConfigTo,
+  deadSettingKeys,
   focusExtension,
   pathInScope,
   pathlessLeafInScope,
@@ -169,6 +170,34 @@ export default class JingyidianPlugin extends Plugin {
     // Chinese default. Anything the user typed is left alone.
     if (LEGACY_STATUS_LABELS.has(this.settings.statusText)) {
       this.settings.statusText = this.t.pluginName;
+    }
+    this.pruneDeadSettings(data);
+  }
+
+  /**
+   * Drop the keys that mean nothing, from both the live settings object
+   * and the file.
+   *
+   * Object.assign copies every key an old install left behind — including
+   * removals from earlier versions — and save() writes them all back, so a
+   * retired setting can never leave on its own. `readingView: true` is the
+   * one that costs the user: it reads like the feature is on, and reading
+   * view was removed.
+   *
+   * The whole step is guarded: a settings migration must never be the
+   * reason the plugin fails to load. If anything throws here the keys
+   * simply stay, which is the state everything worked in before.
+   */
+  private pruneDeadSettings(saved: Partial<JingyidianSettings> | null) {
+    try {
+      const dead = deadSettingKeys(saved ?? {});
+      if (dead.length === 0) return;
+      for (const key of dead) {
+        delete (this.settings as unknown as Record<string, unknown>)[key];
+      }
+      void this.save();
+    } catch {
+      // Leave the file alone rather than risk the load path.
     }
   }
 

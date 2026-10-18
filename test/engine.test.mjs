@@ -11,6 +11,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { Decoration } from "@codemirror/view";
 import {
 	buildForTest,
+	deadSettingKeys,
 	focusedLinesForTest as focusedLines,
 	focusEngineSpec,
 	pathInScope,
@@ -625,6 +626,86 @@ t("override: CJK names work regardless of UI language", () => {
   assert.equal(readFocusOverride("小节"), "section", "simplified 节");
   assert.equal(readFocusOverride("行"), "line");
   assert.equal(readFocusOverride("句"), "sentence");
+});
+
+/* --------------------------- dead setting keys --------------------------- */
+// Keys nothing reads. The interesting half of these cases is what must NOT
+// be reported: a live setting merely sharing a prefix with a dead one.
+
+t("dead keys: a fresh install has none to prune", () => {
+	assert.deepEqual(deadSettingKeys({}), []);
+});
+
+t("dead keys: null-like input does not throw", () => {
+	assert.deepEqual(deadSettingKeys(null), []);
+	assert.deepEqual(deadSettingKeys(undefined), []);
+});
+
+t("dead keys: every retired key is reported", () => {
+	assert.deepEqual(
+		deadSettingKeys({
+			readingView: true,
+			rememberState: true,
+			debugReading: true,
+		}),
+		["readingView", "rememberState", "debugReading"],
+	);
+});
+
+t("dead keys: onlyFocusedWindow is deliberately left alone", () => {
+	// d605562 removed it and added a smoke guard that fails if that name
+	// reappears in the bundle. Pruning the key would mean naming it again,
+	// so it stays in the file, inert. This case pins that choice.
+	assert.deepEqual(deadSettingKeys({ onlyFocusedWindow: true }), []);
+	assert.deepEqual(
+		deadSettingKeys({ onlyFocusedWindow: false, readingView: true }),
+		["readingView"],
+	);
+});
+
+t("dead keys: only the keys that are present are reported", () => {
+	assert.deepEqual(deadSettingKeys({ readingView: false }), ["readingView"]);
+	assert.deepEqual(deadSettingKeys({ debugReading: true }), ["debugReading"]);
+});
+
+t("dead keys: a live setting is never mistaken for a dead one", () => {
+	// Everything a current install actually writes. None of these may be
+	// reported, or the migration would delete real settings.
+	const live = {
+		enabled: false,
+		granularity: "sentence",
+		dimOpacity: 0.3,
+		sectionLevel: 2,
+		keepHeading: true,
+		exemptRich: true,
+		transitionMs: 140,
+		dimTitle: true,
+		onlyPaths: [],
+		exceptPaths: [],
+		frontmatterKey: "focus",
+		showStatusBar: true,
+		statusText: "Desk Lamp",
+		lang: "zh",
+		migratedFromStille: true,
+	};
+	assert.deepEqual(deadSettingKeys(live), []);
+});
+
+t("dead keys: an inherited property is not a dead key", () => {
+	// `in` would see the prototype chain, so a settings object built with
+	// Object.create(withDefaults) — or any refactor that parks a default on
+	// a prototype — must not be reported. The four names are absent from
+	// Object.prototype itself, so this needs a prototype carrying one.
+	const proto = { readingView: true };
+	const saved = Object.create(proto);
+	saved.granularity = "line";
+	assert.deepEqual(deadSettingKeys(saved), []);
+});
+
+t("dead keys: a false value is still a key worth pruning", () => {
+	// readingView defaulted to off, so "it's already false" is not a reason
+	// to leave the key sitting in the file looking configurable.
+	assert.deepEqual(deadSettingKeys({ readingView: false }), ["readingView"]);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);
