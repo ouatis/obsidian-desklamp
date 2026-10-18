@@ -118,6 +118,15 @@ function isRichLine(state: EditorState, lineNo: number): boolean {
  */
 const SENTENCE_END = /[.!?。！？…]/;
 
+/**
+ * How far back to look for the word a period belongs to. The abbreviation
+ * and single-initial guards only ever inspect the token immediately before
+ * the dot, so this tail is as good as the whole prefix — and it keeps the
+ * scan linear. 64 comfortably covers any abbreviation in the list plus
+ * surrounding dots ("e.g." = 4).
+ */
+const ABBREV_SCAN = 64;
+
 /** Abbreviations after which a period does NOT end a sentence. */
 const ABBREVIATIONS = new Set([
   "mr",
@@ -178,7 +187,12 @@ export function sentenceBoundaries(text: string): number[] {
     // Guard against abbreviations: "Mr." / "e.g." only count when the
     // token before the dot is a known short form.
     if (ch === ".") {
-      const before = text.slice(0, i);
+      // Only the token immediately before the dot matters, so reading a
+      // fixed-size tail is equivalent to reading the whole prefix — but it
+      // keeps this O(n) instead of O(n²). Slicing the entire prefix on
+      // every dot made a 5 000-line paragraph with no blank line cost
+      // ~100ms per keystroke in sentence granularity.
+      const before = text.slice(Math.max(0, i - ABBREV_SCAN), i);
       const m = /([A-Za-zÀ-ÿ.]+)$/.exec(before);
       const word = (m?.[1] ?? "").replace(/\./g, "").toLowerCase();
       if (word && ABBREVIATIONS.has(word)) continue;

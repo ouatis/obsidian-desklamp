@@ -340,6 +340,108 @@ t("sentence: empty text does not throw", () => {
 	assert.deepEqual(sentenceBoundaries(""), []);
 });
 
+// The abbreviation guard reads only the token just before the dot, so a
+// fixed-size tail must give the same answer as the whole prefix. These
+// cases are the reason: a long run of words would otherwise make the
+// per-dot prefix slice quadratic, and a 5 000-line paragraph with no
+// blank line cost ~175ms per keystroke in sentence granularity.
+t("sentence: abbreviation still detected deep into a long text", () => {
+	const filler = "one two three four five six seven eight nine ten ";
+	const text = filler.repeat(40) + "Mr. Smith left. " + filler.repeat(40) + "e.g. this.";
+	const bounds = sentenceBoundaries(text);
+	// Both guarded dots must be absent from the boundaries; the two real
+	// terminators (after "Smith left" and "this.") must be present.
+	assert.equal(bounds.length, 2, `expected 2 boundaries, got ${bounds.length}`);
+});
+
+t("sentence: a single initial is still skipped after a long prefix", () => {
+	const filler = "alpha beta gamma delta epsilon zeta eta theta ";
+	const text = filler.repeat(30) + "J. Smith arrived.";
+	const bounds = sentenceBoundaries(text);
+	assert.equal(bounds.length, 1, `expected 1 boundary, got ${bounds.length}`);
+});
+
+t("sentence: a decimal is not a boundary however long the prefix", () => {
+	const filler = "x y z ";
+	const text = filler.repeat(50) + "pi is 3.14159 and more text.";
+	const bounds = sentenceBoundaries(text);
+	assert.equal(bounds.length, 1, `expected 1 boundary, got ${bounds.length}`);
+});
+
+t("sentence: dense terminators stay linear and correct", () => {
+	// 3000 sentences in one string: the case that used to cost ~450ms.
+	const text = "word word word word word. ".repeat(3000);
+	const bounds = sentenceBoundaries(text);
+	assert.equal(bounds.length, 3000);
+	assert.equal(bounds[bounds.length - 1], text.length - 1);
+});
+
+// The abbreviation guard now reads a fixed-size tail instead of the whole
+// prefix. That is only safe if the two always agree, so compare them on
+// inputs built to stress the seam: guarded dots, initials, decimals,
+// ellipses, CJK terminators, closing quotes, and a long unbroken token
+// right before the dot. wholePrefixBoundaries() is the pre-window
+// implementation, kept here as the oracle.
+const ABBREV_LIST = new Set([
+	"mr", "mrs", "ms", "dr", "prof", "sr", "jr", "st", "vs", "etc", "eg", "ie",
+	"fig", "no", "vol", "pp", "ed", "eds", "al", "inc", "ltd", "co", "approx",
+	"dept", "univ", "cf", "ca", "circa",
+]);
+
+function wholePrefixBoundaries(text) {
+	const out = [];
+	for (let i = 0; i < text.length; i++) {
+		const ch = text[i];
+		if (!/[.!?。！？…]/.test(ch)) continue;
+		if (ch === "." && text[i + 1] === "." && text[i + 2] === ".") {
+			i += 2;
+			while (text[i + 1] === ".") i++;
+		}
+		const next = text[i + 1];
+		const nextIsEnd = next === undefined || /\s/.test(next);
+		const cjk = /[。！？…]/.test(ch);
+		const nextIsCloser = next !== undefined && /["'”’」』）)\]】》]/.test(next);
+		if (!cjk && !nextIsEnd && !nextIsCloser) continue;
+		if (ch === ".") {
+			const before = text.slice(0, i);
+			const m = /([A-Za-zÀ-ÿ.]+)$/.exec(before);
+			const word = (m?.[1] ?? "").replace(/\./g, "").toLowerCase();
+			if (word && ABBREV_LIST.has(word)) continue;
+			if (word.length === 1 && /^[A-Z]$/.test(m?.[1] ?? "")) continue;
+			if (/\d$/.test(before) && next !== undefined && /\d/.test(next)) continue;
+		}
+		out.push(i + 1);
+	}
+	return out;
+}
+
+t("sentence: the tail window agrees with the whole prefix on every case", () => {
+	const cases = [
+		"Mr. Smith left.",
+		"Dr. Who? Yes.",
+		"e.g. this and i.e. that.",
+		"J. Smith arrived. K. Jones left.",
+		"pi is 3.14159 exactly.",
+		"version 1.2.3 released.",
+		"Wait... what? Yes.",
+		"他说：「走吧。」我说好。",
+		'quote ends." Then more.',
+		"bracket.) done",
+		"a".repeat(200) + "e.g. done.", // long unbroken token before the dot
+		"word ".repeat(50) + "approx. ten",
+		"no space before.and after",
+		"",
+		"just one sentence no terminator",
+	];
+	for (const c of cases) {
+		assert.deepEqual(
+			sentenceBoundaries(c),
+			wholePrefixBoundaries(c),
+			`diverged on: ${JSON.stringify(c.slice(0, 40))}`,
+		);
+	}
+});
+
 t("sentence: lights only the caret's sentence", () => {
 	// Each sentence is on its own line inside one paragraph, so the line
 	// granularity has something real to distinguish: only the caret's line
