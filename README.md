@@ -27,9 +27,9 @@ embed, a formula, or a table always stay lit. The on/off state is remembered
 across restarts, and the ribbon icon shows it.
 
 Quiet panels, thin rules and small transitions share a visual rhythm with
-Scriptorium and Skill Switchboard. The interface still follows your Obsidian
-theme's fonts and colors; neither sibling product is required. English is the
-default, with Chinese and Japanese available in settings.
+Scriptorium, Skill Switchboard and Collate. The interface still follows your
+Obsidian theme's fonts and colors; no sibling product is required. English is
+the default, with Chinese and Japanese available in settings.
 
 > [!NOTE]
 > Reading view is deliberately not supported. There is no caret there, so the
