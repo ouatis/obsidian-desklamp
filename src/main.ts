@@ -713,7 +713,7 @@ class JingyidianSettingTab extends PluginSettingTab {
       .setDesc(this.plugin.t.frontmatterKeyDesc)
       .addText((t) =>
         t
-          .setPlaceholder("focus")
+          .setPlaceholder("Focus")
           .setValue(this.plugin.settings.frontmatterKey)
           .onChange(async (v) => {
             await this.set({ frontmatterKey: v.trim() });
