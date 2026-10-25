@@ -5,6 +5,7 @@ import {
   Plugin,
   PluginSettingTab,
   Setting,
+  SettingDefinitionItem,
   addIcon,
   normalizePath,
   setIcon,
@@ -563,184 +564,224 @@ class JingyidianSettingTab extends PluginSettingTab {
   private async set(p: Partial<JingyidianSettings>) {
     Object.assign(this.plugin.settings, p);
     await this.plugin.save();
-    this.display();
+    this.update();
   }
 
-  display() {
-    const { containerEl } = this;
-    containerEl.empty();
-    containerEl.addClass("dl-settings");
-
-    const header = containerEl.createDiv("dl-settings-header");
-    const lamp = header.createDiv("dl-settings-lamp");
-    lamp.setAttribute("aria-hidden", "true");
-    lamp.toggleClass("is-on", this.plugin.settings.enabled);
-    setIcon(lamp, this.plugin.settings.enabled ? "dl-lamp-on" : "dl-lamp-off");
-    const heading = header.createDiv("dl-settings-heading");
-    new Setting(heading).setName(this.plugin.t.pluginName).setHeading();
-    heading.createEl("p", {
-      text: this.plugin.t.tagline,
-      cls: "setting-item-description dl-settings-tagline",
-    });
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.languageName)
-      .setDesc(this.plugin.t.languageDesc)
-      .addDropdown((d) => {
-        for (const l of LANGUAGES) d.addOption(l.id, `${l.flag}  ${l.label}`);
-        d.setValue(this.plugin.settings.lang).onChange(async (v) => {
-          await this.set({ lang: v as Lang });
-        });
-      });
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.toggleName)
-      .setDesc(this.plugin.t.toggleDesc)
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.enabled).onChange(async (v) => {
-          await this.set({ enabled: v });
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.granularityName)
-      .setDesc(this.plugin.t.granularityDesc)
-      .addDropdown((d) =>
-        d
-          .addOption("line", this.plugin.t.gLine)
-          .addOption("sentence", this.plugin.t.gSentence)
-          .addOption("paragraph", this.plugin.t.gParagraph)
-          .addOption("section", this.plugin.t.gSection)
-          .setValue(this.plugin.settings.granularity)
-          .onChange(async (v) => {
-            await this.set({ granularity: v as Granularity });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.opacityName)
-      .setDesc(this.plugin.t.opacityDesc)
-      .addSlider((s) =>
-        s
-          .setLimits(0, 1, 0.05)
-          .setValue(this.plugin.settings.dimOpacity)
-          .onChange(async (v) => {
-            await this.set({ dimOpacity: v });
-          }),
-      );
-
-    if (this.plugin.settings.granularity === "section") {
-      new Setting(containerEl)
-        .setName(this.plugin.t.sectionLevelName)
-        .setDesc(this.plugin.t.sectionLevelDesc)
-        .addSlider((s) =>
-          s
-            .setLimits(1, 6, 1)
-            .setValue(this.plugin.settings.sectionLevel)
-            .onChange(async (v) => {
-              await this.set({ sectionLevel: v });
-            }),
-        );
+  getControlValue(key: string): unknown {
+    if (key === "onlyPaths" || key === "exceptPaths") {
+      return this.plugin.settings[key].join(NL);
     }
+    return super.getControlValue(key);
+  }
 
-    if (this.plugin.settings.granularity === "section") {
-      new Setting(containerEl)
-        .setName(this.plugin.t.keepHeadingName)
-        .setDesc(this.plugin.t.keepHeadingDesc)
-        .addToggle((t) =>
-          t.setValue(this.plugin.settings.keepHeading).onChange(async (v) => {
-            await this.set({ keepHeading: v });
-          }),
-        );
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    if (key === "onlyPaths" || key === "exceptPaths") {
+      await this.set({ [key]: splitLines(String(value)) });
+      return;
     }
+    if (key === "frontmatterKey") {
+      await this.set({ frontmatterKey: String(value).trim() });
+      return;
+    }
+    await this.set({ [key]: value });
+  }
 
-    new Setting(containerEl)
-      .setName(this.plugin.t.exemptRichName)
-      .setDesc(this.plugin.t.exemptRichDesc)
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.exemptRich).onChange(async (v) => {
-          await this.set({ exemptRich: v });
-        }),
-      );
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    const t = this.plugin.t;
+    const s = this.plugin.settings;
+    const sectionScope = () => s.granularity === "section";
 
-    new Setting(containerEl)
-      .setName(this.plugin.t.transitionName)
-      .setDesc(this.plugin.t.transitionDesc)
-      .addSlider((s) =>
-        s
-          .setLimits(0, 500, 10)
-          .setValue(this.plugin.settings.transitionMs)
-          .onChange(async (v) => {
-            await this.set({ transitionMs: v });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.dimTitleName)
-      .setDesc(this.plugin.t.dimTitleDesc)
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.dimTitle).onChange(async (v) => {
-          await this.set({ dimTitle: v });
-        }),
-      );
-
-    new Setting(containerEl).setName(this.plugin.t.sectionScope).setHeading();
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.onlyPathsName)
-      .setDesc(this.plugin.t.onlyPathsDesc)
-      .addTextArea((t) =>
-        t
-          .setValue(this.plugin.settings.onlyPaths.join("\n"))
-          .onChange(async (v) => {
-            await this.set({ onlyPaths: splitLines(v) });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.exceptPathsName)
-      .setDesc(this.plugin.t.exceptPathsDesc)
-      .addTextArea((t) =>
-        t
-          .setValue(this.plugin.settings.exceptPaths.join("\n"))
-          .onChange(async (v) => {
-            await this.set({ exceptPaths: splitLines(v) });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.frontmatterKeyName)
-      .setDesc(this.plugin.t.frontmatterKeyDesc)
-      .addText((t) =>
-        t
-          .setPlaceholder("Focus")
-          .setValue(this.plugin.settings.frontmatterKey)
-          .onChange(async (v) => {
-            await this.set({ frontmatterKey: v.trim() });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.sectionStatusBar)
-      .setHeading();
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.showStatusBar)
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.showStatusBar).onChange(async (v) => {
-          await this.set({ showStatusBar: v });
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName(this.plugin.t.statusTextName)
-      .addText((t) =>
-        t.setValue(this.plugin.settings.statusText).onChange(async (v) => {
-          await this.set({ statusText: v });
-        }),
-      );
+    return [
+      {
+        type: "group",
+        cls: "dl-settings",
+        items: [
+          {
+            name: t.pluginName,
+            searchable: false,
+            render: (setting) => {
+              setting.infoEl.empty();
+              const header = setting.infoEl.createDiv("dl-settings-header");
+              const lamp = header.createDiv("dl-settings-lamp");
+              lamp.setAttribute("aria-hidden", "true");
+              lamp.toggleClass("is-on", s.enabled);
+              setIcon(lamp, s.enabled ? "dl-lamp-on" : "dl-lamp-off");
+              const heading = header.createDiv("dl-settings-heading");
+              new Setting(heading).setName(t.pluginName).setHeading();
+              header.createEl("p", {
+                text: t.tagline,
+                cls: "setting-item-description dl-settings-tagline",
+              });
+            },
+          },
+          {
+            name: t.languageName,
+            desc: t.languageDesc,
+            control: {
+              type: "dropdown",
+              key: "lang",
+              options: Object.fromEntries(
+                LANGUAGES.map((l) => [l.id, l.flag + "  " + l.label]),
+              ),
+              defaultValue: DEFAULT_LANG,
+            },
+          },
+          {
+            name: t.toggleName,
+            desc: t.toggleDesc,
+            control: {
+              type: "toggle",
+              key: "enabled",
+              defaultValue: DEFAULTS.enabled,
+            },
+          },
+          {
+            name: t.granularityName,
+            desc: t.granularityDesc,
+            control: {
+              type: "dropdown",
+              key: "granularity",
+              options: {
+                line: t.gLine,
+                sentence: t.gSentence,
+                paragraph: t.gParagraph,
+                section: t.gSection,
+              },
+              defaultValue: DEFAULTS.granularity,
+            },
+          },
+          {
+            name: t.opacityName,
+            desc: t.opacityDesc,
+            control: {
+              type: "slider",
+              key: "dimOpacity",
+              min: 0,
+              max: 1,
+              step: 0.05,
+              defaultValue: DEFAULTS.dimOpacity,
+              displayFormat: (v) => Math.round(v * 100) + "%",
+            },
+          },
+          {
+            name: t.sectionLevelName,
+            desc: t.sectionLevelDesc,
+            visible: sectionScope,
+            control: {
+              type: "slider",
+              key: "sectionLevel",
+              min: 1,
+              max: 6,
+              step: 1,
+              defaultValue: DEFAULTS.sectionLevel,
+            },
+          },
+          {
+            name: t.keepHeadingName,
+            desc: t.keepHeadingDesc,
+            visible: sectionScope,
+            control: {
+              type: "toggle",
+              key: "keepHeading",
+              defaultValue: DEFAULTS.keepHeading,
+            },
+          },
+          {
+            name: t.exemptRichName,
+            desc: t.exemptRichDesc,
+            control: {
+              type: "toggle",
+              key: "exemptRich",
+              defaultValue: DEFAULTS.exemptRich,
+            },
+          },
+          {
+            name: t.transitionName,
+            desc: t.transitionDesc,
+            control: {
+              type: "slider",
+              key: "transitionMs",
+              min: 0,
+              max: 500,
+              step: 10,
+              defaultValue: DEFAULTS.transitionMs,
+              displayFormat: (v) => v + " ms",
+            },
+          },
+          {
+            name: t.dimTitleName,
+            desc: t.dimTitleDesc,
+            control: {
+              type: "toggle",
+              key: "dimTitle",
+              defaultValue: DEFAULTS.dimTitle,
+            },
+          },
+          {
+            name: t.sectionScope,
+            searchable: false,
+            render: (setting) => {
+              setting.setName(t.sectionScope).setHeading();
+            },
+          },
+          {
+            name: t.onlyPathsName,
+            desc: t.onlyPathsDesc,
+            control: {
+              type: "textarea",
+              key: "onlyPaths",
+              defaultValue: DEFAULTS.onlyPaths.join("\n"),
+            },
+          },
+          {
+            name: t.exceptPathsName,
+            desc: t.exceptPathsDesc,
+            control: {
+              type: "textarea",
+              key: "exceptPaths",
+              defaultValue: DEFAULTS.exceptPaths.join("\n"),
+            },
+          },
+          {
+            name: t.frontmatterKeyName,
+            desc: t.frontmatterKeyDesc,
+            control: {
+              type: "text",
+              key: "frontmatterKey",
+              placeholder: "Focus",
+              defaultValue: DEFAULTS.frontmatterKey,
+            },
+          },
+          {
+            name: t.sectionStatusBar,
+            searchable: false,
+            render: (setting) => {
+              setting.setName(t.sectionStatusBar).setHeading();
+            },
+          },
+          {
+            name: t.showStatusBar,
+            control: {
+              type: "toggle",
+              key: "showStatusBar",
+              defaultValue: DEFAULTS.showStatusBar,
+            },
+          },
+          {
+            name: t.statusTextName,
+            control: {
+              type: "text",
+              key: "statusText",
+              defaultValue: DEFAULTS.statusText,
+            },
+          },
+        ],
+      },
+    ];
   }
 }
+
+const NL = "\\n";
 
 function splitLines(v: string): string[] {
   return v
