@@ -10,7 +10,7 @@ Desk Lamp——Obsidian 插件:把你正在工作的行/句/段/节以外的一�
 ## 构建与验证
 
 ```bash
-npm run verify   # 全链:typecheck → engine 测试 → install:vault → build → bundle 冒烟
+npm run verify   # 全链:audit:deps → typecheck → lint → engine 测试 → build → install:vault → bundle 冒烟
 npm run dev      # esbuild watch
 ```
 
