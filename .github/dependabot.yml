@@ -1,0 +1,15 @@
+# Action versions drift silently and a stale action fails on Node runtimes long
+# after the code in this repository stopped changing. Group every update into
+# one pull request so a weekly run stays reviewable.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
