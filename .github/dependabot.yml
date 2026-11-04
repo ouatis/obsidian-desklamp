@@ -13,3 +13,18 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+  # npm dependencies drift the same way — esbuild, TypeScript and the lint stack
+  # were several minors behind when this was written. Grouped into one weekly
+  # pull request so a review stays small; majors still get read by hand because
+  # they change compiler and lint behaviour.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+    groups:
+      npm:
+        patterns: ["*"]
+        dependency-type: development
