@@ -21,7 +21,7 @@ _Room lights off, one lamp left on._
 An Obsidian plugin that dims everything except the line, sentence, paragraph,
 or section you are working on.
 
-![Desk Lamp: a long checklist with the item under the caret lit and every other line dimmed. Real screenshot, version 0.6.0.](img/screenshot-list-focus.png)
+![Desk Lamp: a long checklist with the item under the caret lit and every other line dimmed. Real screenshot.](img/screenshot-list-focus.png)
 
 The rest of the note falls back at an opacity you set. Granularity can be
 pinned per note through frontmatter, scoped to folders, and lines holding an
@@ -41,7 +41,7 @@ the default, with Chinese and Japanese available in settings.
 
 ## Install
 
-Requires Obsidian 1.5.0 or newer.
+Requires Obsidian 1.13.0 or newer.
 
 **From Obsidian:** enable community plugins, then open
 **Settings → Community plugins → Browse** and search for **Desk Lamp**. The
@@ -69,7 +69,9 @@ as a plugin source (only useful for trying unreleased versions).
 - **Multi-caret** — every caret computes its own lit range
 - **Opacity slider** 0–1, and a 0–500 ms transition that respects
   `prefers-reduced-motion`
-- **Ribbon icon** shows the state: outline when off, filled when on
+- **Ribbon and status bar lamps** — the same lamp shape in both places,
+  outline when off and filled when on. The status bar item also shows the
+  current granularity; click it to cycle, or hide it in settings.
 - Adopts the opacity from a previously installed focus plugin, so switching over is not a jump
 
 ### Where it stops
@@ -111,18 +113,12 @@ optional title dimming, the ribbon and Desk Lamp's own status bar item.
 ## Development
 
 ```bash
-npm install
-npm run dev         # watch build
-npm run typecheck
-npm test            # engine tests
-npm run build       # production build
-npm run test:bundle # smoke tests against the built artifact
-npm run verify      # all of the above, then install into the vault
+npm ci && npm run verify
 ```
 
-The engine tests import the real functions from `src/engine.ts` and run them
-against real CodeMirror state and the real markdown parser, so they cannot
-drift from the source. `test/perf.mjs` measures the per-keystroke cost.
+`npm run verify` is the whole gate: dependency audit, typecheck, lint, engine
+tests against real editor state, production build, and the vault install.
+Conventions live in `AGENTS.md`.
 
 Created by [@ouatis](https://github.com/ouatis). Inspired by
 [Stille](https://github.com/michaellee/stille) by Michael Lee. Ribbon icon from

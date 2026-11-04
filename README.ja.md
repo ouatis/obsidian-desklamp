@@ -20,7 +20,7 @@ _部屋の灯りを消して、一つだけ残す。_
 
 書いている行・文・段落・節だけを残し、それ以外はすべて薄暗くする Obsidian プラグイン。
 
-![Desk Lamp：長いチェックリストで、カーソルのある項目だけが明るく、他の行は薄暗くなっています。実際のスクリーンショット（v0.6.0）。](img/screenshot-list-focus.png)
+![Desk Lamp：長いチェックリストで、カーソルのある項目だけが明るく、他の行は薄暗くなっています。実際のスクリーンショット。](img/screenshot-list-focus.png)
 
 それ以外の部分は設定した不透明度に沈みます。粒度は frontmatter でノート単位に固定でき、適用範囲はフォルダで絞り込めます。埋め込み・数式・表を含む行は決して暗くなりません。オン/オフの状態は再起動後も保持され、リボンのアイコンがそれを示します。
 
@@ -31,7 +31,7 @@ _部屋の灯りを消して、一つだけ残す。_
 
 ## インストール
 
-Obsidian 1.5.0 以降が必要です。
+Obsidian 1.13.0 以降が必要です。
 
 **Obsidian から**：コミュニティプラグインを有効にし、**設定 → コミュニティプラグイン → 参照**で「Desk Lamp」を検索。掲載ページは
 [community.obsidian.md/plugins/desklamp](https://community.obsidian.md/plugins/desklamp)。
@@ -53,7 +53,7 @@ Obsidian 1.5.0 以降が必要です。
 - **決して暗くしない**——埋め込み・数式・表を含む行
 - **マルチカーソル**——カーソルごとに独立して点灯範囲を計算
 - **不透明度スライダー** 0–1、0–500 ms の遷移は `prefers-reduced-motion` を尊重
-- **リボンアイコン**が状態を示す：オフでアウトライン、オンで塗りつぶし
+- **リボンとステータスバーのランプ**——どちらも同じランプの形で、オフはアウトライン、オンは塗りつぶし。ステータスバーの項目は現在の粒度も表示し、クリックで切り替え、設定で非表示にできます。
 - 以前使っていたフォーカス系プラグインから不透明度を引き継ぐので、乗り換えが段差になりません
 
 ### 限界
@@ -81,17 +81,10 @@ Desk Lamp は CodeMirror 6 の `ViewPlugin` で行デコレーションを行い
 ## 開発
 
 ```bash
-npm install
-npm run dev         # ウォッチビルド
-npm run typecheck
-npm test            # エンジンテスト
-npm run build       # 本番ビルド
-npm run test:bundle # ビルド成果物に対するスモークテスト
-npm run verify      # 以上すべて、その後に vault へインストール
+npm ci && npm run verify
 ```
 
-エンジンのテストは `src/engine.ts` から実際の関数をインポートし、実際の CodeMirror
-の状態と実際の markdown パーサーに対して実行します。そのためテストがソースから逸脱することはありません。`test/perf.mjs` は 1 キーストロークあたりのコストを測ります。
+`npm run verify` が唯一のゲートです——依存監査、型チェック、lint、実際のエディタ状態に対するエンジンテスト、本番ビルド、そして vault へのインストールまで。運用ルールは `AGENTS.md` にあります。
 
 作者 [@ouatis](https://github.com/ouatis)。インスピレーション:
 [Stille](https://github.com/michaellee/stille)。リボンアイコン:

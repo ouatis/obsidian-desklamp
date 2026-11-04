@@ -20,7 +20,7 @@ _房间大灯关掉，只留一盏。_
 
 一款 Obsidian 插件：把你正在写的那一行、那一句、那一段或那一节留下，其余全部调暗。
 
-![小台灯：一段长清单里，光标所在的一项保持清晰，其余全部调暗。真实截图，0.6.0 版。](img/screenshot-list-focus.png)
+![小台灯：一段长清单里，光标所在的一项保持清晰，其余全部调暗。真实截图。](img/screenshot-list-focus.png)
 
 其余内容退到你设定的不透明度。粒度可以用 frontmatter 单篇指定，范围可以按文件夹限定；含嵌入块、公式、表格的行永远清晰。开关状态跨重启记住，丝带图标随明灭。
 
@@ -31,7 +31,7 @@ _房间大灯关掉，只留一盏。_
 
 ## 安装
 
-需要 Obsidian 1.5.0 或更新版本。
+需要 Obsidian 1.13.0 或更新版本。
 
 **从 Obsidian 安装**：开启第三方插件后，设置 → 第三方插件 → 浏览，搜「Desk Lamp」即可。条目页在
 [community.obsidian.md/plugins/desklamp](https://community.obsidian.md/plugins/desklamp)。
@@ -54,7 +54,7 @@ _房间大灯关掉，只留一盏。_
 - **永不调暗**含嵌入块、公式、表格的行
 - **多光标**——每个光标各算各的亮区
 - **不透明度** 0–1 可调，0–500 ms 过渡尊重 `prefers-reduced-motion`
-- **丝带图标**即状态：灭时描边，亮时填充
+- **丝带与状态栏指示灯**——两处同款灯形：灭时描边，亮时填充。状态栏项还会显示当前粒度；点击切换，也可在设置里隐藏。
 - 从你之前装过的聚焦插件继承不透明度，切换过来不是一次跳变
 
 ### 止于何处
@@ -84,17 +84,10 @@ Desk Lamp 用 CodeMirror 6 的 `ViewPlugin` 做行级装饰。每次选区变化
 ## 开发
 
 ```bash
-npm install
-npm run dev         # 监听构建
-npm run typecheck
-npm test            # 引擎测试
-npm run build       # 生产构建
-npm run test:bundle # 对构建产物跑冒烟测试
-npm run verify      # 以上全部，然后装进仓库实测
+npm ci && npm run verify
 ```
 
-引擎测试直接从 `src/engine.ts` 导入真实函数，跑在真实的 CodeMirror 状态和真实的
-markdown 解析器上，所以测试不会与源码漂移。`test/perf.mjs` 测的是每次按键的代价。
+`npm run verify` 是完整的门禁：依赖审计、类型检查、lint、跑在真实编辑器状态上的引擎测试、生产构建，以及装进仓库实测。维护约定见 `AGENTS.md`。
 
 作者 [@ouatis](https://github.com/ouatis)。灵感来自
 [Stille](https://github.com/michaellee/stille)。丝带图标出自
