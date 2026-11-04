@@ -28,3 +28,7 @@ updates:
       npm:
         patterns: ["*"]
         dependency-type: development
+    # obsidian pins its CodeMirror peers to exact versions, so an update here
+    # breaks `npm ci` for everyone. Leave those to the obsidian package itself.
+    ignore:
+      - dependency-name: "@codemirror/*"
