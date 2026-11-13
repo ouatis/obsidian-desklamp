@@ -1,0 +1,42 @@
+# Action versions drift silently and a stale action fails on Node runtimes long
+# after the code in this repository stopped changing. Group every update into
+# one pull request so a weekly run stays reviewable.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+  # npm dependencies drift the same way — esbuild, TypeScript and the lint stack
+  # were several minors behind when this was written. Grouped into one weekly
+  # pull request so a review stays small; majors still get read by hand because
+  # they change compiler and lint behaviour.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+    groups:
+      npm:
+        patterns: ["*"]
+        dependency-type: development
+    # obsidian pins its CodeMirror peers to exact versions, so an update here
+    # breaks `npm ci` for everyone. Leave those to the obsidian package itself.
+    ignore:
+      - dependency-name: "@codemirror/*"
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]

@@ -1,0 +1,10 @@
+{
+	"id": "desklamp",
+	"name": "Desk Lamp",
+	"version": "0.7.1",
+	"minAppVersion": "1.13.0",
+	"description": "Room lights off, one lamp left on.",
+	"author": "SigiL",
+	"authorUrl": "https://github.com/ouatis",
+	"isDesktopOnly": false
+}
