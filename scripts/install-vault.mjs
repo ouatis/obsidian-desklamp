@@ -10,12 +10,17 @@
  *         JY_VAULT=/path/to/vault node scripts/install-vault.mjs
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const project = path.join(here, "..");
-const vault = process.argv[2] ?? process.env.JY_VAULT ?? "D:/JARDIN";
+const defaultVault =
+	process.platform === "win32"
+		? "D:/JARDIN"
+		: path.join(os.homedir(), "Documents", "JARDIN");
+const vault = process.argv[2] ?? process.env.JY_VAULT ?? defaultVault;
 
 const manifestPath = path.join(project, "manifest.json");
 if (!fs.existsSync(manifestPath)) {

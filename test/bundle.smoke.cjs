@@ -1,6 +1,7 @@
 // Loads the shipped bundle with "obsidian" stubbed, then runs the checks.
 // Kept as CJS because the resolution hook only fires on the CJS path.
 const path = require("node:path");
+const os = require("node:os");
 const fs = require("node:fs");
 const assert = require("node:assert/strict");
 const Module = require("node:module");
@@ -12,7 +13,11 @@ const Module = require("node:module");
 const manifest = JSON.parse(
   fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "utf8"),
 );
-const VAULT = process.env.JY_VAULT ?? "D:/JARDIN";
+const DEFAULT_VAULT =
+  process.platform === "win32"
+    ? "D:/JARDIN"
+    : path.join(os.homedir(), "Documents", "JARDIN");
+const VAULT = process.env.JY_VAULT ?? DEFAULT_VAULT;
 // path.resolve normalises the separators so the same value works whether
 // it arrived as D:/x, D:\x or a POSIX path from CI.
 const BUNDLE =

@@ -138,9 +138,9 @@ function isRichLine(state: EditorState, lineNo: number): boolean {
   if (/^\s*!?\[\[[^\]]+\]\]\s*$/.test(text)) return true; // embeds
   if (/^\s*\$\$/.test(text)) return true; // display math
   if (/^\s*\|.*\|\s*$/.test(text)) return true; // table row
-  // Inline math. The lookbehind keeps an escaped dollar from opening a
-  // pair, so "\$5 and \$10" stays ordinary prose (and stays dimmable).
-  if (/(?<!\\)\$[^$\n]+\$/.test(text)) return true; // inline math
+  // Inline math. Avoid lookbehind (iOS < 16.4) while still letting "\$5 and \$10"
+  // stay ordinary prose and "\\$x$" (escaped backslash + math) match.
+  if (/(?:^|[^\\])(?:\\\\)*\$[^$\n]+\$/.test(text)) return true; // inline math
   return false;
 }
 
