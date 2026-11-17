@@ -40,7 +40,7 @@ Obsidian 1.13.0 以降が必要です。
 `main.js`・`manifest.json`・`styles.css` をダウンロードし、
 `<vault>/.obsidian/plugins/desklamp/` に入れて、**設定 → コミュニティプラグイン**で有効化します。
 
-[BRAT](https://github.com/thesephist/brats) を使う場合：`ouatis/obsidian-desklamp`
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) を使う場合：`ouatis/obsidian-desklamp`
 をプラグインソースに追加してください（未リリース版の試用専用です）。
 
 ## 特徴

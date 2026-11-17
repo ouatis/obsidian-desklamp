@@ -54,7 +54,7 @@ from the
 them in `<vault>/.obsidian/plugins/desklamp/`, then enable it under
 **Settings → Community plugins**.
 
-With [BRAT](https://github.com/thesephist/brats): add `ouatis/obsidian-desklamp`
+With [BRAT](https://github.com/TfTHacker/obsidian42-brat): add `ouatis/obsidian-desklamp`
 as a plugin source (only useful for trying unreleased versions).
 
 ## Features

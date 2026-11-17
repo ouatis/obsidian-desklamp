@@ -41,7 +41,7 @@ _房间大灯关掉，只留一盏。_
 下载 `main.js`、`manifest.json` 和 `styles.css`，放进
 `<vault>/.obsidian/plugins/desklamp/`，再到 **设置 → 第三方插件** 里启用。
 
-用 [BRAT](https://github.com/thesephist/brats)：把 `ouatis/obsidian-desklamp`
+用 [BRAT](https://github.com/TfTHacker/obsidian42-brat)：把 `ouatis/obsidian-desklamp`
 加为插件源（仅对尝鲜未发布版本有用）。
 
 ## 特性
