@@ -13,10 +13,14 @@ const Module = require("node:module");
 const manifest = JSON.parse(
   fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "utf8"),
 );
+const CANDIDATES = [
+  path.join(os.homedir(), "Documents", "JARDIN"),
+  "D:/JARDIN",
+];
 const DEFAULT_VAULT =
-  process.platform === "win32"
-    ? "D:/JARDIN"
-    : path.join(os.homedir(), "Documents", "JARDIN");
+  CANDIDATES.find((dir) =>
+    fs.existsSync(path.join(dir, ".obsidian", "appearance.json")),
+  ) ?? CANDIDATES[0];
 const VAULT = process.env.JY_VAULT ?? DEFAULT_VAULT;
 // path.resolve normalises the separators so the same value works whether
 // it arrived as D:/x, D:\x or a POSIX path from CI.

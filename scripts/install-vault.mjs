@@ -16,10 +16,14 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const project = path.join(here, "..");
+const candidates = [
+	path.join(os.homedir(), "Documents", "JARDIN"),
+	"D:/JARDIN",
+];
 const defaultVault =
-	process.platform === "win32"
-		? "D:/JARDIN"
-		: path.join(os.homedir(), "Documents", "JARDIN");
+	candidates.find((dir) =>
+		fs.existsSync(path.join(dir, ".obsidian", "appearance.json")),
+	) ?? candidates[0];
 const vault = process.argv[2] ?? process.env.JY_VAULT ?? defaultVault;
 
 const manifestPath = path.join(project, "manifest.json");
