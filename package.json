@@ -12,7 +12,7 @@
 		"test:ui:live": "node test/ui-live.mjs",
 		"audit:deps": "npm audit --audit-level=moderate",
 		"install:vault": "node scripts/install-vault.mjs",
-		"verify": "npm run audit:deps && npm run typecheck && npm run lint && npm test && npm run build && npm run install:vault && npm run test:bundle",
+		"verify": "npm run audit:deps && npm run typecheck && npm run lint && npm test && npm run build && npm run test:bundle",
 		"lint": "eslint ."
 	},
 	"keywords": [

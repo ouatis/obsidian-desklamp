@@ -84,7 +84,7 @@ Desk Lamp は CodeMirror 6 の `ViewPlugin` で行デコレーションを行い
 npm ci && npm run verify
 ```
 
-`npm run verify` が唯一のゲートです——依存監査、型チェック、lint、実際のエディタ状態に対するエンジンテスト、本番ビルド、そして vault へのインストールまで。運用ルールは `AGENTS.md` にあります。
+`npm run verify` が唯一のゲートです——依存監査、型チェック、lint、実際のエディタ状態に対するエンジンテスト、本番ビルド、そしてバンドルのスモークテストまで。運用ルールは `AGENTS.md` にあります。
 
 作者 [@ouatis](https://github.com/ouatis)。インスピレーション:
 [Stille](https://github.com/michaellee/stille)。リボンアイコン:

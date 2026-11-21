@@ -10,8 +10,9 @@ Desk Lamp——Obsidian 插件:把你正在工作的行/句/段/节以外的一�
 ## 构建与验证
 
 ```bash
-npm run verify   # 全链:audit:deps → typecheck → lint → engine 测试 → build → install:vault → bundle 冒烟
-npm run dev      # esbuild watch
+npm run verify        # 全链:audit:deps → typecheck → lint → engine 测试 → build → bundle 冒烟
+npm run install:vault # 显式将构建产物安装到本地 vault（默认探测 ~/Documents/JARDIN 或 JY_VAULT）
+npm run dev           # esbuild watch
 ```
 
 CI 的 verify 作业跑同一条链(外加性能探针),并以 `needs: verify` 把守
@@ -22,9 +23,7 @@ release 作业——**verify 不过,发版不启动**。别绕过它。
 - `src/engine.ts` —— 调暗逻辑本体(纯函数,`test/engine.test.mjs` 单测)。
 - `src/main.ts` —— Obsidian 接线(编辑器装饰、ribbon、设置)。
 - `src/strings.ts` —— 多语言 UI 字符串。
-- `test/bundle.smoke.cjs` —— 在假 vault 里加载构建产物做冒烟
-  (`scripts/install-vault.mjs` 负责把插件装进 vault;CI 用 `JY_VAULT`
-  指向伪 vault,本地默认装进作者的 vault)。
+- `test/bundle.smoke.cjs` —— 直接加载根目录构建产物 `main.js` 做冒烟（亦可通过 `JY_VAULT` / `JY_BUNDLE` 指向外部副本；`scripts/install-vault.mjs` 负责显式把插件装进本地 vault）。
 - `manifest.json` —— id `desklamp`;`isDesktopOnly: false`。
 
 ## 约定

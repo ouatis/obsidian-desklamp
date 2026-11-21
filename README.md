@@ -117,7 +117,7 @@ npm ci && npm run verify
 ```
 
 `npm run verify` is the whole gate: dependency audit, typecheck, lint, engine
-tests against real editor state, production build, and the vault install.
+tests against real editor state, production build, and the bundle smoke test.
 Conventions live in `AGENTS.md`.
 
 Created by [@ouatis](https://github.com/ouatis). Inspired by

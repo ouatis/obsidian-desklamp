@@ -74,18 +74,24 @@ function cfgOf(state: EditorState): EngineConfig {
  * A Setext heading spans two lines, so both of its lines report the level.
  */
 const HEADING_RE = /^(?:ATX|Setext)Heading([1-6])$/;
+const ATX_RE = /^ {0,3}(#{1,6})(?:[ \t]+.*|[ \t]*)$/;
 
 function headingLevelAt(state: EditorState, lineNo: number): number {
   const line = state.doc.line(lineNo);
-  // Resolve inside the line, biased to the end, so the underline of a
-  // Setext heading resolves into the heading node rather than to the
-  // following sibling.
-  const node = syntaxTree(state).resolveInner(line.to, -1);
-  for (let n: typeof node | null = node; n; n = n.parent) {
-    const m = HEADING_RE.exec(n.name);
-    if (m) return Number(m[1]);
+  const tree = syntaxTree(state);
+  if (line.to <= tree.length) {
+    // Resolve inside the line, biased to the end, so the underline of a
+    // Setext heading resolves into the heading node rather than to the
+    // following sibling.
+    const node = tree.resolveInner(line.to, -1);
+    for (let n: typeof node | null = node; n; n = n.parent) {
+      const m = HEADING_RE.exec(n.name);
+      if (m) return Number(m[1]);
+    }
+    return 0;
   }
-  return 0;
+  const atx = ATX_RE.exec(line.text);
+  return atx ? atx[1].length : 0;
 }
 
 /** Lines that visually continue the paragraph containing `lineNo`. */

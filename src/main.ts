@@ -140,7 +140,7 @@ export default class JingyidianPlugin extends Plugin {
       this.syncTimer = null;
     }
     // Strip anything we put on <body> so nothing leaks after disabling.
-    document.body.classList.remove("dl-title-dim", "dl-active");
+    activeDocument.body.classList.remove("dl-title-dim", "dl-active");
   }
 
   /** Strings for the selected UI language. */
@@ -388,11 +388,11 @@ export default class JingyidianPlugin extends Plugin {
   }
 
   private paintBodyClasses() {
-    document.body.classList.toggle(
+    activeDocument.body.classList.toggle(
       "dl-title-dim",
       this.settings.enabled && this.settings.dimTitle,
     );
-    document.body.classList.toggle("dl-active", this.settings.enabled);
+    activeDocument.body.classList.toggle("dl-active", this.settings.enabled);
   }
 
   /* ---------------------------- commands ----------------------------- */
@@ -792,7 +792,7 @@ class JingyidianSettingTab extends PluginSettingTab {
   }
 }
 
-const NL = "\\n";
+const NL = "\n";
 
 function splitLines(v: string): string[] {
   return v

@@ -6,32 +6,20 @@ const fs = require("node:fs");
 const assert = require("node:assert/strict");
 const Module = require("node:module");
 
-// Read the id from manifest.json so a rename cannot leave this test
-// pointing at a stale directory — the same reason install-vault.mjs does.
-// JY_VAULT lets CI (and anyone with the vault elsewhere) redirect both the
-// vault location and, via JY_BUNDLE, the artifact under test.
+const PROJECT = path.join(__dirname, "..");
 const manifest = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "..", "manifest.json"), "utf8"),
+  fs.readFileSync(path.join(PROJECT, "manifest.json"), "utf8"),
 );
-const CANDIDATES = [
-  path.join(os.homedir(), "Documents", "JARDIN"),
-  "D:/JARDIN",
-];
-const DEFAULT_VAULT =
-  CANDIDATES.find((dir) =>
-    fs.existsSync(path.join(dir, ".obsidian", "appearance.json")),
-  ) ?? CANDIDATES[0];
-const VAULT = process.env.JY_VAULT ?? DEFAULT_VAULT;
-// path.resolve normalises the separators so the same value works whether
-// it arrived as D:/x, D:\x or a POSIX path from CI.
+const VAULT_DIR = process.env.JY_VAULT
+  ? path.resolve(process.env.JY_VAULT, ".obsidian", "plugins", manifest.id)
+  : PROJECT;
 const BUNDLE =
-  process.env.JY_BUNDLE ??
-  path.resolve(VAULT, ".obsidian", "plugins", manifest.id, "main.js");
+  process.env.JY_BUNDLE ?? path.resolve(VAULT_DIR, "main.js");
+const STYLES = path.resolve(VAULT_DIR, "styles.css");
 const src = fs.readFileSync(BUNDLE, "utf8");
 
-// The bundle lives in the vault, so it cannot reach this project's
-// node_modules for the CodeMirror externals. Resolve them explicitly.
-const PROJECT = path.join(__dirname, "..");
+// If the bundle under test lives outside the project directory (via JY_VAULT
+// or JY_BUNDLE), resolve CodeMirror externals from this project's node_modules.
 const externals = {
   obsidian: path.join(__dirname, "stubs", "obsidian.js"),
   "@codemirror/state": require.resolve("@codemirror/state", {
@@ -247,7 +235,7 @@ t("bundle is reasonably small", () => {
 });
 
 t("settings use scoped family shapes and host fonts", () => {
-  const css = fs.readFileSync(path.join(VAULT, ".obsidian", "plugins", manifest.id, "styles.css"), "utf8");
+  const css = fs.readFileSync(STYLES, "utf8");
   assert.ok(src.includes('"dl-settings"'));
   assert.ok(src.includes('"dl-settings-header"'));
   assert.match(css, /--dl-control-radius:\s*8px/);
@@ -255,6 +243,42 @@ t("settings use scoped family shapes and host fonts", () => {
   assert.match(css, /font-family:\s*var\(--font-interface\)/);
   assert.match(css, /@container\s*\(max-width:\s*420px\)/);
   assert.doesNotMatch(css, /#[\da-f]{3,8}\b|https?:\/\//i);
+});
+
+t("multi-line onlyPaths and exceptPaths round-trip with real newlines", () => {
+  assert.ok(!src.includes('"\\\\n"'), "must not join paths with a literal \\\\n");
+  let tab;
+  const plugin = new PluginClass(
+    {
+      workspace: {
+        on: () => ({}),
+        onLayoutReady: () => {},
+        getActiveViewOfType: () => null,
+        getLeavesOfType: () => [],
+      },
+      vault: {
+        configDir: ".obsidian",
+        adapter: { read: async () => { throw new Error("none"); } },
+      },
+    },
+    manifest,
+  );
+  plugin.loadSettings = async () => {
+    plugin.settings.onlyPaths = ["novels", "drafts"];
+    plugin.settings.exceptPaths = ["archive", "trash"];
+  };
+  plugin.migrateFromStille = async () => {};
+  plugin.paintBodyClasses = () => {};
+  plugin.renderStatusBar = () => {};
+  plugin.paintRibbon = () => {};
+  plugin.syncAllEditors = () => {};
+  plugin.save = () => {};
+  plugin.addRibbonIcon = () => ({ addClass() {}, toggleClass() {}, setAttribute() {} });
+  plugin.registerEditorExtension = () => {};
+  plugin.addCommand = () => {};
+  plugin.registerEvent = () => {};
+  plugin.addSettingTab = (settingTab) => { tab = settingTab; };
+  plugin.onload();
 });
 
 t("status styling belongs only to Desk Lamp's own item", () => {

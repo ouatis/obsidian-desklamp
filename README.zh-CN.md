@@ -87,7 +87,7 @@ Desk Lamp 用 CodeMirror 6 的 `ViewPlugin` 做行级装饰。每次选区变化
 npm ci && npm run verify
 ```
 
-`npm run verify` 是完整的门禁：依赖审计、类型检查、lint、跑在真实编辑器状态上的引擎测试、生产构建，以及装进仓库实测。维护约定见 `AGENTS.md`。
+`npm run verify` 是完整的门禁：依赖审计、类型检查、lint、跑在真实编辑器状态上的引擎测试、生产构建，以及构建产物冒烟测试。维护约定见 `AGENTS.md`。
 
 作者 [@ouatis](https://github.com/ouatis)。灵感来自
 [Stille](https://github.com/michaellee/stille)。丝带图标出自

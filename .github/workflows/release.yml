@@ -29,15 +29,8 @@ jobs:
         run: node --experimental-strip-types test/perf.mjs
       - name: Build
         run: npm run build
-      - name: Stage a fake vault so the bundle smoke test has a home
-        run: |
-          mkdir -p fakevault/.obsidian/plugins/desklamp
-          cp main.js fakevault/.obsidian/plugins/desklamp/
-          cp manifest.json styles.css fakevault/.obsidian/plugins/desklamp/
       - name: Bundle smoke test
         run: npm run test:bundle
-        env:
-          JY_VAULT: ${{ github.workspace }}/fakevault
 
   release:
     needs: verify

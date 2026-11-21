@@ -773,5 +773,32 @@ t("dead keys: a false value is still a key worth pruning", () => {
 	assert.deepEqual(deadSettingKeys({ readingView: false }), ["readingView"]);
 });
 
+t("section: resolves ATX headings beyond Lezer's initial parse frontier", () => {
+	const out = [];
+	for (let s = 1; s <= 120; s++) {
+		out.push(`## Section ${s}`);
+		for (let i = 0; i < 10; i++) {
+			out.push(`Line ${i + 1} of section ${s}, with some prose.`);
+		}
+		out.push("");
+	}
+	const doc = out.join("\n");
+	const s0 = EditorState.create({ doc, extensions: [markdown()] });
+	const lastSectionLine = s0.doc.lines - 5;
+	const s = EditorState.create({
+		doc,
+		extensions: [markdown()],
+		selection: EditorSelection.create([
+			EditorSelection.cursor(s0.doc.line(lastSectionLine).from),
+		]),
+	});
+	const lit = focusedLines(s, {
+		granularity: "section",
+		sectionLevel: 2,
+		keepHeading: true,
+	});
+	assert.equal(lit.size, 12, "only the 12 lines of the final section should light");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);
