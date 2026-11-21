@@ -81,8 +81,7 @@ body.dl-title-dim .inline-title:focus-within {
 
 .dl-settings .dl-settings-header {
 	align-items: center;
-	background: var(--background-secondary);
-	background: color-mix(in srgb, var(--background-secondary) 35%, var(--background-primary));
+	background-color: color-mix(in srgb, var(--background-secondary) 35%, var(--background-primary));
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--dl-panel-radius);
 	display: grid;
